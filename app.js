@@ -159,8 +159,8 @@ db.on('open', function callback(){
 
 
 	// });
-	http.createServer(function (request, response) {
-		response.writeHead(200, {'Content-Type': 'text/plain'});
-		response.end(JSON.stringify(data));
-	}).listen(8124);
+	// http.createServer(function (request, response) {
+	// 	response.writeHead(200, {'Content-Type': 'text/plain'});
+	// 	response.end(JSON.stringify(data));
+	// }).listen(8124);
 });
