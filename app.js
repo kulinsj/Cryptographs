@@ -1,8 +1,5 @@
 var mongoose = require('mongoose');
 var http = require('http');
-var jsdom = require('jsdom');
-var window = jsdom.jsdom().createWindow();
-var jquery = require('jquery')(window);
 
 var NETurl = 'http://pubapi.cryptsy.com/api.php?method=singlemarketdata&marketid=134';
 mongoose.connect('mongodb://localhost/Markets');
@@ -75,25 +72,26 @@ db.on('open', function callback(){
 						});
 
 						var oldTrades = foundMarket.recenttrades;
+                        console.log('old trade size: ' + oldTrades.length);
 						var newTrades = temp.recenttrades;
-						jquery.merge(newTrades, oldTrades);
+                        var dupeMerge = oldTrades.concat(newTrades);
 
 						var existingIDs = [];
-						var mergedTrades = jquery.grep(newTrades, function(v) {
-						    if (jquery.inArray(v.id, existingIDs) !== -1) {
-						        return false;
-						    }
-						    else {
-						        existingIDs.push(v.id);
-						        return true;
-						    }
-						});
-						mergedTrades.sort(function(a, b) {
-						    var akey = a.id, bkey = b.id;
+                        var merged = [];
+                        for (var ind in dupeMerge) {
+                            var id = dupeMerge[ind].id;
+                            if (existingIDs.indexOf(id)==-1){
+                                existingIDs.push(id);
+                                merged.push(dupeMerge[ind]);
+                            }
+                        }
+						merged.sort(function(a, b) {
+						    var akey = a.time, bkey = b.time;
 						    if(akey < bkey) return 1;
 						    if(akey > bkey) return -1;
 						    return 0;
 						});
+                        console.log('merged trade size: ' + merged.length);
 
 						var oldBuys = foundMarket.buyorders;
 						var newBuys = temp.buyorders;
@@ -101,10 +99,10 @@ db.on('open', function callback(){
 						var oldSells = foundMarket.sellorders;
 						var newSells = temp.sellorders;
 
-						foundMarket.recenttrades = mergedTrades;
+						foundMarket.recenttrades = merged;
 						foundMarket.sellorders = newSells;
 						foundMarket.buyorders = newBuys;
-						foundMarket.lasttradeprice = mergedTrades[0].price;
+						foundMarket.lasttradeprice = merged[0].price;
 						foundMarket.save(function(err){
 							if (err)
 								console.log('failed to update: ' + err);
