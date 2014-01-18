@@ -2,69 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="39d41a6b-8460-433c-b2c8-0369f45d8199" name="Default" comment="">
-      <change type="DELETED" beforePath="E:\Cryptographs\node_modules\mongoose\node_modules\mongodb\node_modules\bson\build\Makefile" afterPath="" />
-      <change type="DELETED" beforePath="E:\Cryptographs\node_modules\mongoose\node_modules\mongodb\node_modules\bson\build\Release\.deps\Release\bson.node.d" afterPath="" />
-      <change type="DELETED" beforePath="E:\Cryptographs\node_modules\mongoose\node_modules\mongodb\node_modules\bson\build\Release\.deps\Release\obj.target\bson\ext\bson.o.d" afterPath="" />
-      <change type="DELETED" beforePath="E:\Cryptographs\node_modules\mongoose\node_modules\mongodb\node_modules\bson\build\Release\bson.node" afterPath="" />
-      <change type="DELETED" beforePath="E:\Cryptographs\node_modules\mongoose\node_modules\mongodb\node_modules\bson\build\Release\linker.lock" afterPath="" />
-      <change type="DELETED" beforePath="E:\Cryptographs\node_modules\mongoose\node_modules\mongodb\node_modules\bson\build\Release\obj.target\bson\ext\bson.o" afterPath="" />
-      <change type="DELETED" beforePath="E:\Cryptographs\node_modules\mongoose\node_modules\mongodb\node_modules\bson\build\binding.Makefile" afterPath="" />
-      <change type="DELETED" beforePath="E:\Cryptographs\node_modules\mongoose\node_modules\mongodb\node_modules\bson\build\bson.target.mk" afterPath="" />
-      <change type="DELETED" beforePath="E:\Cryptographs\node_modules\mongoose\node_modules\mongodb\node_modules\bson\build\config.gypi" afterPath="" />
-      <change type="DELETED" beforePath="E:\Cryptographs\node_modules\mongoose\node_modules\mongodb\node_modules\bson\build\gyp-mac-tool" afterPath="" />
-      <change type="DELETED" beforePath="E:\Cryptographs\node_modules\mongoose\node_modules\mongodb\node_modules\kerberos\build\Makefile" afterPath="" />
-      <change type="DELETED" beforePath="E:\Cryptographs\node_modules\mongoose\node_modules\mongodb\node_modules\kerberos\build\Release\.deps\Release\kerberos.node.d" afterPath="" />
-      <change type="DELETED" beforePath="E:\Cryptographs\node_modules\mongoose\node_modules\mongodb\node_modules\kerberos\build\Release\.deps\Release\obj.target\kerberos\lib\base64.o.d" afterPath="" />
-      <change type="DELETED" beforePath="E:\Cryptographs\node_modules\mongoose\node_modules\mongodb\node_modules\kerberos\build\Release\.deps\Release\obj.target\kerberos\lib\kerberos.o.d" afterPath="" />
-      <change type="DELETED" beforePath="E:\Cryptographs\node_modules\mongoose\node_modules\mongodb\node_modules\kerberos\build\Release\.deps\Release\obj.target\kerberos\lib\kerberos_context.o.d" afterPath="" />
-      <change type="DELETED" beforePath="E:\Cryptographs\node_modules\mongoose\node_modules\mongodb\node_modules\kerberos\build\Release\.deps\Release\obj.target\kerberos\lib\kerberosgss.o.d" afterPath="" />
-      <change type="DELETED" beforePath="E:\Cryptographs\node_modules\mongoose\node_modules\mongodb\node_modules\kerberos\build\Release\.deps\Release\obj.target\kerberos\lib\worker.o.d" afterPath="" />
-      <change type="DELETED" beforePath="E:\Cryptographs\node_modules\mongoose\node_modules\mongodb\node_modules\kerberos\build\Release\kerberos.node" afterPath="" />
-      <change type="DELETED" beforePath="E:\Cryptographs\node_modules\mongoose\node_modules\mongodb\node_modules\kerberos\build\Release\linker.lock" afterPath="" />
-      <change type="DELETED" beforePath="E:\Cryptographs\node_modules\mongoose\node_modules\mongodb\node_modules\kerberos\build\Release\obj.target\kerberos\lib\base64.o" afterPath="" />
-      <change type="DELETED" beforePath="E:\Cryptographs\node_modules\mongoose\node_modules\mongodb\node_modules\kerberos\build\Release\obj.target\kerberos\lib\kerberos.o" afterPath="" />
-      <change type="DELETED" beforePath="E:\Cryptographs\node_modules\mongoose\node_modules\mongodb\node_modules\kerberos\build\Release\obj.target\kerberos\lib\kerberos_context.o" afterPath="" />
-      <change type="DELETED" beforePath="E:\Cryptographs\node_modules\mongoose\node_modules\mongodb\node_modules\kerberos\build\Release\obj.target\kerberos\lib\kerberosgss.o" afterPath="" />
-      <change type="DELETED" beforePath="E:\Cryptographs\node_modules\mongoose\node_modules\mongodb\node_modules\kerberos\build\Release\obj.target\kerberos\lib\worker.o" afterPath="" />
-      <change type="DELETED" beforePath="E:\Cryptographs\node_modules\mongoose\node_modules\mongodb\node_modules\kerberos\build\binding.Makefile" afterPath="" />
-      <change type="DELETED" beforePath="E:\Cryptographs\node_modules\mongoose\node_modules\mongodb\node_modules\kerberos\build\config.gypi" afterPath="" />
-      <change type="DELETED" beforePath="E:\Cryptographs\node_modules\mongoose\node_modules\mongodb\node_modules\kerberos\build\gyp-mac-tool" afterPath="" />
-      <change type="DELETED" beforePath="E:\Cryptographs\node_modules\mongoose\node_modules\mongodb\node_modules\kerberos\build\kerberos.target.mk" afterPath="" />
-      <change type="DELETED" beforePath="E:\Cryptographs\node_modules\mongoose\node_modules\mquery\node_modules\mongodb\node_modules\bson\build\Makefile" afterPath="" />
-      <change type="DELETED" beforePath="E:\Cryptographs\node_modules\mongoose\node_modules\mquery\node_modules\mongodb\node_modules\bson\build\Release\.deps\Release\bson.node.d" afterPath="" />
-      <change type="DELETED" beforePath="E:\Cryptographs\node_modules\mongoose\node_modules\mquery\node_modules\mongodb\node_modules\bson\build\Release\.deps\Release\obj.target\bson\ext\bson.o.d" afterPath="" />
-      <change type="DELETED" beforePath="E:\Cryptographs\node_modules\mongoose\node_modules\mquery\node_modules\mongodb\node_modules\bson\build\Release\bson.node" afterPath="" />
-      <change type="DELETED" beforePath="E:\Cryptographs\node_modules\mongoose\node_modules\mquery\node_modules\mongodb\node_modules\bson\build\Release\linker.lock" afterPath="" />
-      <change type="DELETED" beforePath="E:\Cryptographs\node_modules\mongoose\node_modules\mquery\node_modules\mongodb\node_modules\bson\build\Release\obj.target\bson\ext\bson.o" afterPath="" />
-      <change type="DELETED" beforePath="E:\Cryptographs\node_modules\mongoose\node_modules\mquery\node_modules\mongodb\node_modules\bson\build\binding.Makefile" afterPath="" />
-      <change type="DELETED" beforePath="E:\Cryptographs\node_modules\mongoose\node_modules\mquery\node_modules\mongodb\node_modules\bson\build\bson.target.mk" afterPath="" />
-      <change type="DELETED" beforePath="E:\Cryptographs\node_modules\mongoose\node_modules\mquery\node_modules\mongodb\node_modules\bson\build\config.gypi" afterPath="" />
-      <change type="DELETED" beforePath="E:\Cryptographs\node_modules\mongoose\node_modules\mquery\node_modules\mongodb\node_modules\bson\build\gyp-mac-tool" afterPath="" />
-      <change type="DELETED" beforePath="E:\Cryptographs\node_modules\mongoose\node_modules\mquery\node_modules\mongodb\node_modules\kerberos\build\Makefile" afterPath="" />
-      <change type="DELETED" beforePath="E:\Cryptographs\node_modules\mongoose\node_modules\mquery\node_modules\mongodb\node_modules\kerberos\build\Release\.deps\Release\kerberos.node.d" afterPath="" />
-      <change type="DELETED" beforePath="E:\Cryptographs\node_modules\mongoose\node_modules\mquery\node_modules\mongodb\node_modules\kerberos\build\Release\.deps\Release\obj.target\kerberos\lib\base64.o.d" afterPath="" />
-      <change type="DELETED" beforePath="E:\Cryptographs\node_modules\mongoose\node_modules\mquery\node_modules\mongodb\node_modules\kerberos\build\Release\.deps\Release\obj.target\kerberos\lib\kerberos.o.d" afterPath="" />
-      <change type="DELETED" beforePath="E:\Cryptographs\node_modules\mongoose\node_modules\mquery\node_modules\mongodb\node_modules\kerberos\build\Release\.deps\Release\obj.target\kerberos\lib\kerberos_context.o.d" afterPath="" />
-      <change type="DELETED" beforePath="E:\Cryptographs\node_modules\mongoose\node_modules\mquery\node_modules\mongodb\node_modules\kerberos\build\Release\.deps\Release\obj.target\kerberos\lib\kerberosgss.o.d" afterPath="" />
-      <change type="DELETED" beforePath="E:\Cryptographs\node_modules\mongoose\node_modules\mquery\node_modules\mongodb\node_modules\kerberos\build\Release\.deps\Release\obj.target\kerberos\lib\worker.o.d" afterPath="" />
-      <change type="DELETED" beforePath="E:\Cryptographs\node_modules\mongoose\node_modules\mquery\node_modules\mongodb\node_modules\kerberos\build\Release\kerberos.node" afterPath="" />
-      <change type="DELETED" beforePath="E:\Cryptographs\node_modules\mongoose\node_modules\mquery\node_modules\mongodb\node_modules\kerberos\build\Release\linker.lock" afterPath="" />
-      <change type="DELETED" beforePath="E:\Cryptographs\node_modules\mongoose\node_modules\mquery\node_modules\mongodb\node_modules\kerberos\build\Release\obj.target\kerberos\lib\base64.o" afterPath="" />
-      <change type="DELETED" beforePath="E:\Cryptographs\node_modules\mongoose\node_modules\mquery\node_modules\mongodb\node_modules\kerberos\build\Release\obj.target\kerberos\lib\kerberos.o" afterPath="" />
-      <change type="DELETED" beforePath="E:\Cryptographs\node_modules\mongoose\node_modules\mquery\node_modules\mongodb\node_modules\kerberos\build\Release\obj.target\kerberos\lib\kerberos_context.o" afterPath="" />
-      <change type="DELETED" beforePath="E:\Cryptographs\node_modules\mongoose\node_modules\mquery\node_modules\mongodb\node_modules\kerberos\build\Release\obj.target\kerberos\lib\kerberosgss.o" afterPath="" />
-      <change type="DELETED" beforePath="E:\Cryptographs\node_modules\mongoose\node_modules\mquery\node_modules\mongodb\node_modules\kerberos\build\Release\obj.target\kerberos\lib\worker.o" afterPath="" />
-      <change type="DELETED" beforePath="E:\Cryptographs\node_modules\mongoose\node_modules\mquery\node_modules\mongodb\node_modules\kerberos\build\binding.Makefile" afterPath="" />
-      <change type="DELETED" beforePath="E:\Cryptographs\node_modules\mongoose\node_modules\mquery\node_modules\mongodb\node_modules\kerberos\build\config.gypi" afterPath="" />
-      <change type="DELETED" beforePath="E:\Cryptographs\node_modules\mongoose\node_modules\mquery\node_modules\mongodb\node_modules\kerberos\build\gyp-mac-tool" afterPath="" />
-      <change type="DELETED" beforePath="E:\Cryptographs\node_modules\mongoose\node_modules\mquery\node_modules\mongodb\node_modules\kerberos\build\kerberos.target.mk" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app.js" afterPath="$PROJECT_DIR$/app.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="Cryptographs.iws" />
     <ignored path=".idea/workspace.xml" />
     <file path="/Dummy.txt" changelist="39d41a6b-8460-433c-b2c8-0369f45d8199" time="1390076930623" ignored="false" />
-    <file path="/app.js" changelist="39d41a6b-8460-433c-b2c8-0369f45d8199" time="1390083150612" ignored="false" />
+    <file path="/app.js" changelist="39d41a6b-8460-433c-b2c8-0369f45d8199" time="1390084124949" ignored="false" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -86,8 +29,10 @@
       <file leaf-file-name="app.js" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="44" column="4" selection-start="1074" selection-end="1113" vertical-scroll-proportion="0.46779302">
-              <folding />
+            <state line="119" column="53" selection-start="3868" selection-end="3868" vertical-scroll-proportion="0.5850053">
+              <folding>
+                <element signature="e#307#823#0" expanded="false" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -274,8 +219,10 @@
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/app.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="44" column="4" selection-start="1074" selection-end="1113" vertical-scroll-proportion="0.46779302">
-          <folding />
+        <state line="119" column="53" selection-start="3868" selection-end="3868" vertical-scroll-proportion="0.5850053">
+          <folding>
+            <element signature="e#307#823#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>

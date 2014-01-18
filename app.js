@@ -3,7 +3,7 @@ var http = require('http');
 
 var NETurl = 'http://pubapi.cryptsy.com/api.php?method=singlemarketdata&marketid=134';
 mongoose.connect('mongodb://localhost/Markets');
-var allURL = 'http://pubapi.cryptsy.com/api.php?method=marketdatav2 ';
+var allURL = 'http://pubapi.cryptsy.com/api.php?method=marketdatav2';
 
 var MarketSchema = mongoose.Schema({
     	marketid: Number,
@@ -41,37 +41,42 @@ db.on('error', console.error.bind(console, 'connection error:'));
 db.on('open', function callback(){
     console.log('connected to mongoose');
 
-    var data;
+    var waiting = false;
     setInterval(function(){
-
-    }, 30000);
-	http.get(allURL, function(res) {
-		//console.log('STATUS: ' + res.statusCode);
-		//console.log('HEADERS: ' + JSON.stringify(res.headers));
-
-		// Buffer the body entirely for processing as a whole.
-		var bodyChunks = [];
-		res.on('data', function(chunk) {
-			// You can process streamed parts here...
-			bodyChunks.push(chunk);
-		}).on('end', function() {
-			var body = Buffer.concat(bodyChunks);
-			data = JSON.parse(body);
-			var name = data.return.markets;
-			for (var key in name) {
-                runUpdate(name[key]);
-			}
-			//console.log('BODY: ' + body);
-			// ...and/or process the entire body here.
-		})
-	});
+        if (!waiting) {
+            waiting = true;
+            var d = new Date();
+            console.log('running GET '+ d.toLocaleTimeString());
+            http.get(allURL, function(res) {
+                waiting = false;
+                // Buffer the body entirely for processing as a whole.
+                var bodyChunks = [];
+                res.on('data', function(chunk) {
+                    // You can process streamed parts here...
+                    bodyChunks.push(chunk);
+                }).on('end', function() {
+                    var body = Buffer.concat(bodyChunks);
+                    try {
+                        var data = JSON.parse(body);
+                        var name = data.return.markets;
+                        for (var key in name) {
+                            runUpdate(name[key]);
+                        }
+                    }
+                    catch(e) {
+                        console.log('caught error: '+e);
+                    }
+                    //console.log('BODY: ' + body);
+                    // ...and/or process the entire body here.
+                })
+            });
+        }
+    }, 20000);
 
 	// 	http.createServer(function (request, response) {
 	// 		response.writeHead(200, {'Content-Type': 'text/plain'});
 	// 		response.end(data);
 	// 	}).listen(8124);
-
-
 
 	// });
 	// http.createServer(function (request, response) {
@@ -85,7 +90,6 @@ var runUpdate = function (thisMarket) {
         if (err) console.log(err);
         if (foundMarket) {
             //update
-
             var temp = new Market({
                 recenttrades: thisMarket.recenttrades,
                 buyorders: thisMarket.buyorders,
