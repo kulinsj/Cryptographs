@@ -1,8 +1,10 @@
 var mongoose = require('mongoose');
 var http = require('http');
+var express = require('express');
+var app = express();
 
 var NETurl = 'http://pubapi.cryptsy.com/api.php?method=singlemarketdata&marketid=134';
-mongoose.connect('mongodb://localhost/Markets');
+mongoose.connect('mongodb://localhost/Markets2');
 var allURL = 'http://pubapi.cryptsy.com/api.php?method=marketdatav2';
 
 var MarketSchema = mongoose.Schema({
@@ -48,6 +50,8 @@ db.on('open', function callback(){
             var d = new Date();
             console.log('running GET '+ d.toLocaleTimeString());
             http.get(allURL, function(res) {
+                d = new Date();
+                console.log('got response '+ d.toLocaleTimeString());
                 waiting = false;
                 // Buffer the body entirely for processing as a whole.
                 var bodyChunks = [];
@@ -73,10 +77,18 @@ db.on('open', function callback(){
         }
     }, 20000);
 
-	// 	http.createServer(function (request, response) {
-	// 		response.writeHead(200, {'Content-Type': 'text/plain'});
-	// 		response.end(data);
-	// 	}).listen(8124);
+    app.get('/', function(request, response){
+        response.send('Hello World');
+    });
+    app.listen(3000);
+
+    /*var server = http.createServer(function (request, response) {
+        response.writeHead(200, {'Content-Type': 'text/plain'});
+        console.log(request);
+        response.write('hello world');
+        response.end();
+        }).listen(8124);*/
+
 
 	// });
 	// http.createServer(function (request, response) {
@@ -130,10 +142,7 @@ var runUpdate = function (thisMarket) {
             foundMarket.buyorders = newBuys;
             foundMarket.lasttradeprice = merged[0].price;
             foundMarket.save(function(err){
-                if (err)
-                    console.log('failed to update: ' + err);
-                //else
-                    //console.log('Updated Successfully');
+                if (err) console.log('failed to update: ' + err);
             });
         }
         else {
