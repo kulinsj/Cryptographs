@@ -2,6 +2,7 @@ var mongoose = require('mongoose');
 var http = require('http');
 var express = require('express');
 var app = express();
+//app.use('/', express.static(__dirname + '/public'));
 
 var NETurl = 'http://pubapi.cryptsy.com/api.php?method=singlemarketdata&marketid=134';
 mongoose.connect('mongodb://localhost/Markets2');
@@ -78,7 +79,18 @@ db.on('open', function callback(){
     }, 20000);
 
     app.get('/', function(request, response){
-        response.send('Hello World');
+        var timeInterval = 60000;
+        var intervalCount = 360;
+        var now = new Date();
+        var start = now.getTime()- timeInterval*(intervalCount+1);
+
+        Market.findOne({'label':'WDC/BTC'}, function(err, foundMarket){
+            var toSend = formatDataToSend(foundMarket, 60000, 360);
+            response.send('Hello World  '+JSON.stringify(toSend));
+            response.end();
+        });
+
+
     });
     app.listen(3000);
 
@@ -171,4 +183,12 @@ var runUpdate = function (thisMarket) {
             });
         }
     });
+}
+
+function formatDataToSend(rawData, timeInterval, intervalCount) {
+    var now = new Date();
+    var rounded = new Date(Math.floor(now.getTime()- timeInterval*(intervalCount)/timeInterval)*timeInterval);
+    var allTrades = rawData.recenttrades;
+
+    return allTrades[0];
 }

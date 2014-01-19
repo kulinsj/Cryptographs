@@ -1,0 +1,30 @@
+{
+  "name": "Cryptographs",
+  "version": "0.0.0",
+  "description": "cryptsy data visualization and order management",
+  "main": "app.js",
+  "dependencies": {
+    "express": "~3.4.8",
+    "mongoose": "~3.8.4"
+  },
+  "devDependencies": {
+      "express" :"*",
+      "mongoose" : "*"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/kulinsj/Cryptographs.git"
+  },
+  "keywords": [
+    "cryptocurrency"
+  ],
+  "author": "Jan Kulinski",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kulinsj/Cryptographs/issues"
+  },
+  "homepage": "https://github.com/kulinsj/Cryptographs"
+}
