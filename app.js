@@ -2,10 +2,16 @@ var mongoose = require('mongoose');
 var http = require('http');
 var express = require('express');
 var app = express();
+var uristring =
+    process.env.MONGOLAB_URI ||
+    process.env.MONGOHQ_URL ||
+    'mongodb://localhost/Markets2';
+var theport = process.env.PORT || 2500;
+
 //app.use('/', express.static(__dirname + '/public'));
 
 var NETurl = 'http://pubapi.cryptsy.com/api.php?method=singlemarketdata&marketid=134';
-mongoose.connect('mongodb://localhost/Markets2');
+mongoose.connect(uristring);
 var allURL = 'http://pubapi.cryptsy.com/api.php?method=marketdatav2';
 
 var MarketSchema = mongoose.Schema({
@@ -92,7 +98,7 @@ db.on('open', function callback(){
 
 
     });
-    app.listen(3000);
+    app.listen(theport);
 
     /*var server = http.createServer(function (request, response) {
         response.writeHead(200, {'Content-Type': 'text/plain'});
@@ -100,7 +106,6 @@ db.on('open', function callback(){
         response.write('hello world');
         response.end();
         }).listen(8124);*/
-
 
 	// });
 	// http.createServer(function (request, response) {
