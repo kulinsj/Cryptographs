@@ -95,9 +95,16 @@ db.on('open', function callback(){
             response.send('Hello World');
             response.end();
         });
-
-
     });
+
+    app.get('/WDC', function(request, response){
+        Market.findOne({'label':'WDC/BTC'}, function(err, foundMarket){
+            var toSend = formatDataToSend(foundMarket, 60000, 360);
+            response.send('Hello World'+JSON.stringify(toSend));
+            response.end();
+        });
+    });
+
     app.listen(theport);
 
     /*var server = http.createServer(function (request, response) {
@@ -194,6 +201,7 @@ function formatDataToSend(rawData, timeInterval, intervalCount) {
     var now = new Date();
     var rounded = new Date(Math.floor(now.getTime()- timeInterval*(intervalCount)/timeInterval)*timeInterval);
     var allTrades = rawData.recenttrades;
-
+    if (!allTrades[0])
+        return('no data found');
     return allTrades[0];
 }
