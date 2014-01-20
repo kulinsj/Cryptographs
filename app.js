@@ -91,8 +91,8 @@ db.on('open', function callback(){
         var start = now.getTime()- timeInterval*(intervalCount+1);
 
         Market.findOne({'label':'WDC/BTC'}, function(err, foundMarket){
-            var toSend = formatDataToSend(foundMarket, 60000, 360);
-            response.send('Hello World  '+JSON.stringify(toSend));
+            //var toSend = formatDataToSend(foundMarket, 60000, 360);
+            response.send('Hello World');
             response.end();
         });
 
