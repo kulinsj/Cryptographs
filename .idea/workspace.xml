@@ -2,18 +2,18 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="39d41a6b-8460-433c-b2c8-0369f45d8199" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/index.html" afterPath="$PROJECT_DIR$/public/index.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/css/style.css" afterPath="$PROJECT_DIR$/public/css/style.css" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="Cryptographs.iws" />
     <ignored path=".idea/workspace.xml" />
-    <file path="/Dummy.txt" changelist="39d41a6b-8460-433c-b2c8-0369f45d8199" time="1390186055987" ignored="false" />
+    <file path="/Dummy.txt" changelist="39d41a6b-8460-433c-b2c8-0369f45d8199" time="1390186166917" ignored="false" />
     <file path="/app.js" changelist="39d41a6b-8460-433c-b2c8-0369f45d8199" time="1390185568453" ignored="false" />
     <file path="/index.html" changelist="39d41a6b-8460-433c-b2c8-0369f45d8199" time="1390186151598" ignored="false" />
     <file path="/package.json" changelist="39d41a6b-8460-433c-b2c8-0369f45d8199" time="1390167905509" ignored="false" />
     <file path="/Procfile" changelist="39d41a6b-8460-433c-b2c8-0369f45d8199" time="1390168248042" ignored="false" />
     <file path="/main.js" changelist="39d41a6b-8460-433c-b2c8-0369f45d8199" time="1390185200889" ignored="false" />
-    <file path="/style.css" changelist="39d41a6b-8460-433c-b2c8-0369f45d8199" time="1390185984447" ignored="false" />
+    <file path="/style.css" changelist="39d41a6b-8460-433c-b2c8-0369f45d8199" time="1390186279752" ignored="false" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -46,19 +46,19 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="index.html" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="index.html" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/public/index.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="6" column="14" selection-start="127" selection-end="127" vertical-scroll-proportion="0.16">
+            <state line="6" column="14" selection-start="127" selection-end="127" vertical-scroll-proportion="-4.645161">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="style.css" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="style.css" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/public/css/style.css">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="2" column="1" selection-start="33" selection-end="33" vertical-scroll-proportion="0.0">
+            <state line="3" column="1" selection-start="64" selection-end="64" vertical-scroll-proportion="0.0773362">
               <folding />
             </state>
           </provider>
@@ -96,8 +96,8 @@
         <option value="$PROJECT_DIR$/Procfile" />
         <option value="$PROJECT_DIR$/public/js/main.js" />
         <option value="$PROJECT_DIR$/app.js" />
-        <option value="$PROJECT_DIR$/public/css/style.css" />
         <option value="$PROJECT_DIR$/public/index.html" />
+        <option value="$PROJECT_DIR$/public/css/style.css" />
       </list>
     </option>
   </component>
@@ -308,7 +308,11 @@
       <created>1390186062687</created>
       <updated>1390186062687</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="Added body id for appending">
+      <created>1390186167963</created>
+      <updated>1390186167963</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -377,7 +381,7 @@
     <option name="WRAP_WHEN_TYPING_REACHES_RIGHT_MARGIN" value="false" />
     <option name="FORCE_NON_EMPTY_COMMENT" value="false" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="false" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added HTML and JS base" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added body id for appending" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_FILES_UP_TO_DATE_BEFORE_COMMIT" value="false" />
@@ -398,6 +402,7 @@
     <MESSAGE value="Get Mondo" />
     <MESSAGE value="Test echoing WDC data from heroku" />
     <MESSAGE value="Added HTML and JS base" />
+    <MESSAGE value="Added body id for appending" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
@@ -462,13 +467,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/public/css/style.css">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="2" column="1" selection-start="33" selection-end="33" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app.js">
       <provider selected="true" editor-type-id="text-editor">
         <state line="104" column="11" selection-start="3350" selection-end="3350" vertical-scroll-proportion="0.0">
@@ -490,7 +488,14 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/public/index.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="6" column="14" selection-start="127" selection-end="127" vertical-scroll-proportion="0.16">
+        <state line="6" column="14" selection-start="127" selection-end="127" vertical-scroll-proportion="-4.645161">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/public/css/style.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="3" column="1" selection-start="64" selection-end="64" vertical-scroll-proportion="0.0773362">
           <folding />
         </state>
       </provider>
