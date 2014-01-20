@@ -1,19 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="39d41a6b-8460-433c-b2c8-0369f45d8199" name="Default" comment="Get Mondo">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/public/css/style.css" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app.js" afterPath="$PROJECT_DIR$/app.js" />
+    <list default="true" id="39d41a6b-8460-433c-b2c8-0369f45d8199" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/index.html" afterPath="$PROJECT_DIR$/public/index.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/js/main.js" afterPath="$PROJECT_DIR$/public/js/main.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="Cryptographs.iws" />
     <ignored path=".idea/workspace.xml" />
-    <file path="/Dummy.txt" changelist="39d41a6b-8460-433c-b2c8-0369f45d8199" time="1390177535382" ignored="false" />
+    <file path="/Dummy.txt" changelist="39d41a6b-8460-433c-b2c8-0369f45d8199" time="1390186055987" ignored="false" />
     <file path="/app.js" changelist="39d41a6b-8460-433c-b2c8-0369f45d8199" time="1390185568453" ignored="false" />
-    <file path="/index.html" changelist="39d41a6b-8460-433c-b2c8-0369f45d8199" time="1390185808513" ignored="false" />
+    <file path="/index.html" changelist="39d41a6b-8460-433c-b2c8-0369f45d8199" time="1390186151598" ignored="false" />
     <file path="/package.json" changelist="39d41a6b-8460-433c-b2c8-0369f45d8199" time="1390167905509" ignored="false" />
     <file path="/Procfile" changelist="39d41a6b-8460-433c-b2c8-0369f45d8199" time="1390168248042" ignored="false" />
     <file path="/main.js" changelist="39d41a6b-8460-433c-b2c8-0369f45d8199" time="1390185200889" ignored="false" />
@@ -36,10 +32,10 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="app.js" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="app.js" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="104" column="11" selection-start="3350" selection-end="3350" vertical-scroll-proportion="2.013072">
+            <state line="104" column="11" selection-start="3350" selection-end="3350" vertical-scroll-proportion="0.0">
               <folding>
                 <element signature="e#553#1069#0" expanded="false" />
                 <element signature="e#3536#3784#0" expanded="false" />
@@ -50,10 +46,10 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="index.html" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="index.html" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/public/index.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="10" column="0" selection-start="248" selection-end="248" vertical-scroll-proportion="-7.7419353">
+            <state line="6" column="14" selection-start="127" selection-end="127" vertical-scroll-proportion="0.16">
               <folding />
             </state>
           </provider>
@@ -71,7 +67,7 @@
       <file leaf-file-name="main.js" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/public/js/main.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="3" column="3" selection-start="127" selection-end="127" vertical-scroll-proportion="0.0">
+            <state line="2" column="8" selection-start="105" selection-end="105" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -100,8 +96,8 @@
         <option value="$PROJECT_DIR$/Procfile" />
         <option value="$PROJECT_DIR$/public/js/main.js" />
         <option value="$PROJECT_DIR$/app.js" />
-        <option value="$PROJECT_DIR$/public/index.html" />
         <option value="$PROJECT_DIR$/public/css/style.css" />
+        <option value="$PROJECT_DIR$/public/index.html" />
       </list>
     </option>
   </component>
@@ -308,7 +304,11 @@
       <created>1390177537574</created>
       <updated>1390177537574</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Added HTML and JS base">
+      <created>1390186062687</created>
+      <updated>1390186062687</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -377,7 +377,7 @@
     <option name="WRAP_WHEN_TYPING_REACHES_RIGHT_MARGIN" value="false" />
     <option name="FORCE_NON_EMPTY_COMMENT" value="false" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="false" />
-    <option name="LAST_COMMIT_MESSAGE" value="Test echoing WDC data from heroku" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added HTML and JS base" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_FILES_UP_TO_DATE_BEFORE_COMMIT" value="false" />
@@ -397,6 +397,7 @@
     <MESSAGE value="removed call to DB for now on URL hit" />
     <MESSAGE value="Get Mondo" />
     <MESSAGE value="Test echoing WDC data from heroku" />
+    <MESSAGE value="Added HTML and JS base" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
@@ -468,29 +469,29 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/public/index.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="10" column="0" selection-start="248" selection-end="248" vertical-scroll-proportion="-7.7419353">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/public/js/main.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="3" column="3" selection-start="127" selection-end="127" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="104" column="11" selection-start="3350" selection-end="3350" vertical-scroll-proportion="2.013072">
+        <state line="104" column="11" selection-start="3350" selection-end="3350" vertical-scroll-proportion="0.0">
           <folding>
             <element signature="e#553#1069#0" expanded="false" />
             <element signature="e#3536#3784#0" expanded="false" />
             <element signature="e#3787#3793#0" expanded="false" />
             <element signature="e#4014#6868#0" expanded="false" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/public/js/main.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="2" column="8" selection-start="105" selection-end="105" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/public/index.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="6" column="14" selection-start="127" selection-end="127" vertical-scroll-proportion="0.16">
+          <folding />
         </state>
       </provider>
     </entry>
