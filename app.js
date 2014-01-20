@@ -8,7 +8,7 @@ var uristring =
     'mongodb://localhost/Markets2';
 var theport = process.env.PORT || 2500;
 
-//app.use('/', express.static(__dirname + '/public'));
+app.use('/', express.static(__dirname + '/public'));
 
 //var NETurl = 'http://pubapi.cryptsy.com/api.php?method=singlemarketdata&marketid=134';
 mongoose.connect(uristring);
@@ -103,6 +103,11 @@ db.on('open', function callback(){
             response.send('Hello World'+JSON.stringify(toSend));
             response.end();
         });
+    });
+
+    app.get('/helloData', function(request, response){
+        response.send("All your base are belong to us.");
+        response.end();
     });
 
     app.listen(theport);
