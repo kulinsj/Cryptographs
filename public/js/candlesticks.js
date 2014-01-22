@@ -14,6 +14,17 @@ var end = new Date();
 var start = new Date(end.getTime() - 1000 * 60 * 60 * 24 * 60);
 var data = [];
 
+//var baseurl = 'http://cryptographs.herokuapp.com';
+var baseurl = 'http://localhost:2500';
+
+$.get(baseurl+'/WDC', function(data, status){
+    $('#body').html(data);
+});
+
+$.get(baseurl+'/helloData', function(data, status){
+    console.log(data);
+});
+
 function min(a, b){ return a < b ? a : b ; }
 
 function max(a, b){ return a > b ? a : b; }
@@ -110,25 +121,26 @@ function appendToData(x){
     buildChart(data);
 }
 
-function buildQuery(){
-    var symbol = window.location.hash;
-    if(symbol === ""){
-        symbol = "AMZN";
-    }
-    symbol = symbol.replace("#", "");
-    var base = "select * from yahoo.finance.historicaldata where symbol = \"{0}\" and startDate = \"{1}\" and endDate = \"{2}\"";
-    var getDateString = d3.time.format("%Y-%m-%d");
-    var query = base.format(symbol, getDateString(start), getDateString(end));
-    query = encodeURIComponent(query);
-    var url = "http://query.yahooapis.com/v1/public/yql?q={0}&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=appendToData".format(query);
-    return url;
-}
-function fetchData(){
-    url = buildQuery();
-    scriptElement = document.createElement("SCRIPT");
-    scriptElement.type = "text/javascript";
-    // i add to the url the call back function
-    scriptElement.src = url;
-    document.getElementsByTagName("HEAD")[0].appendChild(scriptElement);
-}
-$(document).ready(fetchData);
+//function buildQuery(){
+//    var symbol = window.location.hash;
+//    if(symbol === ""){
+//        symbol = "AMZN";
+//    }
+//    symbol = symbol.replace("#", "");
+//    var base = "select * from yahoo.finance.historicaldata where symbol = \"{0}\" and startDate = \"{1}\" and endDate = \"{2}\"";
+//    var getDateString = d3.time.format("%Y-%m-%d");
+//    var query = base.format(symbol, getDateString(start), getDateString(end));
+//    query = encodeURIComponent(query);
+//    var url = "http://query.yahooapis.com/v1/public/yql?q={0}&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=appendToData".format(query);
+//    return url;
+//}
+//function fetchData(){
+//    console.log('fecth');
+//    url = buildQuery();
+//    scriptElement = document.createElement("SCRIPT");
+//    scriptElement.type = "text/javascript";
+//    // i add to the url the call back function
+//    scriptElement.src = url;
+//    document.getElementsByTagName("HEAD")[0].appendChild(scriptElement);
+//}
+//$(document).ready(fetchData);
