@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="39d41a6b-8460-433c-b2c8-0369f45d8199" name="Default" comment="better font">
+    <list default="true" id="39d41a6b-8460-433c-b2c8-0369f45d8199" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="Cryptographs.iws" />
     <ignored path=".idea/workspace.xml" />
-    <file path="/Dummy.txt" changelist="39d41a6b-8460-433c-b2c8-0369f45d8199" time="1390422239247" ignored="false" />
+    <file path="/Dummy.txt" changelist="39d41a6b-8460-433c-b2c8-0369f45d8199" time="1390422312666" ignored="false" />
     <file path="/app.js" changelist="39d41a6b-8460-433c-b2c8-0369f45d8199" time="1390185568453" ignored="false" />
     <file path="/index.html" changelist="39d41a6b-8460-433c-b2c8-0369f45d8199" time="1390186151598" ignored="false" />
     <file path="/package.json" changelist="39d41a6b-8460-433c-b2c8-0369f45d8199" time="1390167905509" ignored="false" />
@@ -380,7 +380,7 @@
     <option name="WRAP_WHEN_TYPING_REACHES_RIGHT_MARGIN" value="false" />
     <option name="FORCE_NON_EMPTY_COMMENT" value="false" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="false" />
-    <option name="LAST_COMMIT_MESSAGE" value="better font" />
+    <option name="LAST_COMMIT_MESSAGE" value="dummy&#10;" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_FILES_UP_TO_DATE_BEFORE_COMMIT" value="false" />
@@ -403,6 +403,7 @@
     <MESSAGE value="Added HTML and JS base" />
     <MESSAGE value="Added body id for appending" />
     <MESSAGE value="better font" />
+    <MESSAGE value="dummy&#10;" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
