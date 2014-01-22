@@ -202,11 +202,57 @@ var runUpdate = function (thisMarket) {
     });
 }
 
+
 function formatDataToSend(rawData, timeInterval, intervalCount) {
-    var now = new Date();
-    var rounded = new Date(Math.floor(now.getTime()- timeInterval*(intervalCount)/timeInterval)*timeInterval);
     var allTrades = rawData.recenttrades;
     if (!allTrades[0])
-        return('no data found');
+        return('no recenttrades found');
+    var now = new Date();
+    var roundedStart = new Date(Math.floor(now.getTime()- timeInterval*(intervalCount)/timeInterval)*timeInterval);
+    var build = true;
+    var times = [];
+    times.push(roundedStart.getTime());
+    var nextTime = roundedStart.getTime() + timeInterval;
+    while (nextTime < roundedStart.getTime()) {
+        times.push(nextTime);
+        nextTime += timeInterval;
+    }
+    times = times.reverse();
+
+    var cont = true;
+    var tradeIndex = 0;
+    var timeIndex = 0;
+    var maxTimeIndex = times.length - 1;
+
+    var output = [];
+    var currentSet = [];
+    for( var i = 0; i < allTrades.length; i++) {
+        if (new Date(allTrades[i].time).getTime() > times[timeIndex]){
+            currentSet.push(allTrades[i])
+        }
+        else {
+            prices = [];
+            for (var j = 0; j < currentSet.length; j++) {
+                prices.push(currentSet.price);
+            }
+            var high = Math.max(prices);
+            var low = Math.min(prices);
+            var close = currentSet[0].price;
+            var open = currentSet[currentSet.length-1].price;
+            output.push({
+                "High":high,
+                "Low":low,
+                "Open": open,
+                "Close": close
+            });
+            currentSet = [];
+            timeIndex++;
+
+            //TODO: increment timeIndex as many times as necessary to push this trade
+        }
+    }
+
+
+
     return allTrades[0];
 }
