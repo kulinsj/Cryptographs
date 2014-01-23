@@ -60,7 +60,7 @@ db.on('open', function callback(){
     console.log('connected to mongoose');
 
     var waiting = false;
-    //setInterval(function(){
+    setInterval(function(){
         if (!waiting) {
             waiting = true;
             var d = new Date();
@@ -93,7 +93,7 @@ db.on('open', function callback(){
                 })
             });
         }
-    //}, 20000);
+    }, 20000);
 
     app.get('/', function(request, response){
         var timeInterval = 60000;
