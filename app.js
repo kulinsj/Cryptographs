@@ -109,9 +109,15 @@ db.on('open', function callback(){
     });
 
     app.get('/WDC', function(request, response){
-        Market.findOne({'label':'WDC/BTC'}, function(err, foundMarket){
-            var toSend = formatDataToSend(foundMarket, 60000, 360);
-            response.send('Hello World'+JSON.stringify(toSend));
+        var timeInterval = 60000;
+        var numberIntervals = 100;
+        var now = new Date();
+        var start = new Date(now - timeInterval*numberIntervals);
+        var roundedStart = new Date(Math.floor(start.getTime()/timeInterval)*timeInterval);
+
+        Trades.find({'marketid':14, 'date':{$gt: roundedStart }}, function (err, trades){
+            var result = formatCandlesticks(timeInterval, numberIntervals, roundedStart, trades);
+            response.write(JSON.stringify(result));
             response.end();
         });
     });
@@ -122,20 +128,11 @@ db.on('open', function callback(){
     });
 
     app.listen(theport);
-
-    /*var server = http.createServer(function (request, response) {
-        response.writeHead(200, {'Content-Type': 'text/plain'});
-        console.log(request);
-        response.write('hello world');
-        response.end();
-        }).listen(8124);*/
-
-	// });
-	// http.createServer(function (request, response) {
-	// 	response.writeHead(200, {'Content-Type': 'text/plain'});
-	// 	response.end(JSON.stringify(data));
-	// }).listen(8124);
 });
+
+var formatCandlesticks = function(interval, numInterval, startDate, data) {
+    return ('words');
+}
 
 var parseTrades = function(data){
     var mID = data.marketid;
@@ -265,59 +262,4 @@ var runUpdate = function (thisMarket) {
             });
         }
     });
-}
-
-
-function formatDataToSend(rawData, timeInterval, intervalCount) {
-    var allTrades = rawData.recenttrades;
-    if (!allTrades[0])
-        return('no recenttrades found');
-    var now = new Date();
-    var roundedStart = new Date(Math.floor(now.getTime()- timeInterval*(intervalCount)/timeInterval)*timeInterval);
-    var build = true;
-    var times = [];
-    times.push(roundedStart.getTime());
-    var nextTime = roundedStart.getTime() + timeInterval;
-    while (nextTime < roundedStart.getTime()) {
-        times.push(nextTime);
-        nextTime += timeInterval;
-    }
-    times = times.reverse();
-
-    var cont = true;
-    var tradeIndex = 0;
-    var timeIndex = 0;
-    var maxTimeIndex = times.length - 1;
-
-    var output = [];
-    var currentSet = [];
-    for( var i = 0; i < allTrades.length; i++) {
-        if (new Date(allTrades[i].time).getTime() > times[timeIndex]){
-            currentSet.push(allTrades[i])
-        }
-        else {
-            prices = [];
-            for (var j = 0; j < currentSet.length; j++) {
-                prices.push(currentSet.price);
-            }
-            var high = Math.max(prices);
-            var low = Math.min(prices);
-            var close = currentSet[0].price;
-            var open = currentSet[currentSet.length-1].price;
-            output.push({
-                "High":high,
-                "Low":low,
-                "Open": open,
-                "Close": close
-            });
-            currentSet = [];
-            timeIndex++;
-
-            //TODO: increment timeIndex as many times as necessary to push this trade
-        }
-    }
-
-
-
-    return allTrades[0];
 }
