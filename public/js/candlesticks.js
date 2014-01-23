@@ -19,6 +19,8 @@ var baseurl = 'http://localhost:2500';
 
 $.get(baseurl+'/WDC', function(data, status){
     $('#body').html(data);
+    var array = JSON.parse(data);
+    console.log(array);
 });
 
 $.get(baseurl+'/helloData', function(data, status){
