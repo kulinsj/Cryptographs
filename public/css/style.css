@@ -3,3 +3,28 @@ html {
     font-family: 'sans-serif';
     
 }
+#chart {
+    background:#eee;
+    text-align:center;
+    white-space:nowrap;
+    overflow:auto;
+    min-width: 600px;
+    min-height: 400px;
+}
+#chart div { box-sizing:border-box; -moz-box-sizing:border-box; }
+.box {
+	display:inline-block;
+	width:3px; margin-right:1px;
+	position:relative; vertical-align:bottom;
+	border:1px solid #ccc; border-width:1px 0;
+}
+.box:before {
+	content:'';
+	position:absolute; height:100%; left:49%;
+	border-left:1px solid #ccc;
+}
+.range {
+	position:absolute; width:100%;
+	border:1px solid #390; background:#6f0;
+}
+.range.fall { border-color:#c00; background:#f33 }

@@ -18,9 +18,21 @@ var data = [];
 var baseurl = 'http://localhost:2500';
 
 $.get(baseurl+'/WDC', function(data, status){
-    $('#body').html(data);
+    //$('#body').html(data);
     var array = JSON.parse(data);
-    console.log(array);
+    //console.log(array);
+    //buildChart(array);
+    var pickyPicky = [];
+    for (var key in array){
+        var omg = [5];
+        omg[0] = array[key].date;
+        omg[1] = array[key].open;
+        omg[2] = array[key].high;
+        omg[3] = array[key].low;
+        omg[4] = array[key].close;
+        pickyPicky.push(omg);
+    }
+    buildOtherChart(pickyPicky);
 });
 
 $.get(baseurl+'/helloData', function(data, status){
@@ -42,11 +54,16 @@ function buildChart(data){
         .attr("height", height);
 
     var y = d3.scale.linear()
-        .domain([d3.min(data.map(function(x) {return x["Low"];})), d3.max(data.map(function(x){return x["High"];}))])
+        .domain([d3.min(data.map(function(x) {return x["low"];})), d3.max(data.map(function(x){return x["high"];}))])
         .range([height-margin, margin]);
     var x = d3.scale.linear()
-        .domain([d3.min(data.map(function(d){return d.timestamp;})), d3.max(data.map(function(d){ return d.timestamp;}))])
+        .domain([d3.min(data.map(function(d){
+            return new Date(d.date).getTime();
+        })), d3.max(data.map(function(d){
+            return new Date(d.date).getTime();
+        }))])
         .range([margin,width-margin]);
+    console.log(x);
 
     chart.selectAll("line.x")
         .data(x.ticks(10))
@@ -92,24 +109,57 @@ function buildChart(data){
     chart.selectAll("rect")
         .data(data)
         .enter().append("svg:rect")
-        .attr("x", function(d) { return x(d.timestamp); })
-        .attr("y", function(d) {return y(max(d.Open, d.Close));})
-        .attr("height", function(d) { return y(min(d.Open, d.Close))-y(max(d.Open, d.Close));})
+        .attr("x", function(d) {
+            return new Date(d.date).getTime(); })
+        .attr("y", function(d) {return y(max(d.open, d.close));})
+        .attr("height", function(d) { return y(min(d.open, d.close))-y(max(d.open, d.close));})
         .attr("width", function(d) { return 0.5 * (width - 2*margin)/data.length; })
-        .attr("fill",function(d) { return d.Open > d.Close ? "red" : "green" ;});
+        .attr("fill",function(d) { return d.open > d.close ? "red" : "green" ;});
 
     chart.selectAll("line.stem")
         .data(data)
         .enter().append("svg:line")
         .attr("class", "stem")
-        .attr("x1", function(d) { return x(d.timestamp) + 0.25 * (width - 2 * margin)/ data.length;})
-        .attr("x2", function(d) { return x(d.timestamp) + 0.25 * (width - 2 * margin)/ data.length;})
-        .attr("y1", function(d) { return y(d.High);})
-        .attr("y2", function(d) { return y(d.Low); })
-        .attr("stroke", function(d){ return d.Open > d.Close ? "red" : "green"; })
+        .attr("x1", function(d) { return x(d.date) + 0.25 * (width - 2 * margin)/ data.length;})
+        .attr("x2", function(d) { return x(d.date) + 0.25 * (width - 2 * margin)/ data.length;})
+        .attr("y1", function(d) { return y(d.high);})
+        .attr("y2", function(d) { return y(d.low); })
+        .attr("stroke", function(d){ return d.open > d.close ? "red" : "green"; })
 
 }
+var buildOtherChart = function(data) {
+    //console.log(data);
+    var $playground = $("#chart");
+    var COL={date:0,open:1,high:2,low:3,close:4};
+    var min=Math.min.apply(Math,data.map(ƒ(COL.low))),
+        max=Math.max.apply(Math,data.map(ƒ(COL.high))),
+        vscale=($playground.offsetHeight-20)/(max-min);
 
+    console.log("min = "+ min + "  and max = "+ max);
+
+//    var vol     = data.map(ƒ(COL.volume));
+//    var volMin  = Math.min.apply(Math,vol),
+//        volDiff = Math.max.apply(Math,vol)-volMin;
+
+    var boxes = d3.select("#playground").selectAll("div.box").data(data);
+
+    boxes.enter()
+      .append('div').attr('class','box')
+        .append('div').attr('class','range');
+
+    boxes
+      .sort(function(a,b){ return a[0]<b[0]?-1:a[0]>b[0]?1:0 })
+      .attr('title',function(d){ return d[COL.date]+" open:"+d[COL.open]+", close:"+d[COL.close]+" ("+d[COL.low]+"–"+d[COL.high]+")" })
+      .style('height',function(d){ return (d[COL.high]-d[COL.low])*vscale+'px' })
+      .style('margin-bottom',function(d){ return (d[COL.low]-min)*vscale+'px'})
+      .select('.range')
+        .classed('fall',function(d){ return d[COL.open]>d[COL.close] })
+        .style('height',function(d){ return Math.abs(d[COL.open]-d[COL.close])*vscale+'px' })
+        .style('bottom',function(d){ return (Math.min(d[COL.close],d[COL.open])-d[COL.low])*vscale+'px'});
+        //.style('opacity',function(d){ return (d[COL.volume]-volMin)/volDiff });
+
+    boxes.exit().remove();
+}
 
 function appendToData(x){
     if(data.length > 0){
@@ -146,3 +196,16 @@ function appendToData(x){
 //    document.getElementsByTagName("HEAD")[0].appendChild(scriptElement);
 //}
 //$(document).ready(fetchData);
+
+
+// Create a function that returns a particular property of its parameter.
+// If that property is a function, invoke it (and pass optional params).
+function ƒ(name){
+  var v,params=Array.prototype.slice.call(arguments,1);
+  return function(o){
+    return (typeof (v=o[name])==='function' ? v.apply(o,params) : v );
+  };
+}
+
+// Return the first argument passed in
+function I(d){ return d }
