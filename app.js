@@ -10,9 +10,9 @@ var theport = process.env.PORT || 2500;
 
 app.use('/', express.static(__dirname + '/public'));
 
-//var NETurl = 'http://pubapi.cryptsy.com/api.php?method=singlemarketdata&marketid=134';
+var WDC_Market_url = 'http://pubapi.cryptsy.com/api.php?method=singlemarketdata&marketid=14';
 mongoose.connect(uristring);
-var allURL = 'http://pubapi.cryptsy.com/api.php?method=marketdatav2';
+//var allURL = 'http://pubapi.cryptsy.com/api.php?method=marketdatav2';
 
 var MarketSchema = mongoose.Schema({
     	marketid: Number,
@@ -42,8 +42,17 @@ var MarketSchema = mongoose.Schema({
 	    	total: Number
 	    }]
     });
-
 var Market = mongoose.model('Market', MarketSchema);
+
+var TradeSchema = mongoose.Schema({
+    marketid: Number,
+    date: Date,
+    price: Number,
+    amount: Number,
+    tradeid: Number
+});
+
+var Trades = mongoose.model('Trades', TradeSchema);
 
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
@@ -51,12 +60,13 @@ db.on('open', function callback(){
     console.log('connected to mongoose');
 
     var waiting = false;
-    setInterval(function(){
+    //setInterval(function(){
         if (!waiting) {
             waiting = true;
             var d = new Date();
             console.log('running GET '+ d.toLocaleTimeString());
-            http.get(allURL, function(res) {
+
+            http.get(WDC_Market_url, function(res) {
                 d = new Date();
                 console.log('got response '+ d.toLocaleTimeString());
                 waiting = false;
@@ -71,7 +81,8 @@ db.on('open', function callback(){
                         var data = JSON.parse(body);
                         var name = data.return.markets;
                         for (var key in name) {
-                            runUpdate(name[key]);
+                            parseTrades(name[key]);
+                            //runUpdate(name[key]);
                         }
                     }
                     catch(e) {
@@ -82,7 +93,7 @@ db.on('open', function callback(){
                 })
             });
         }
-    }, 20000);
+    //}, 20000);
 
     app.get('/', function(request, response){
         var timeInterval = 60000;
@@ -125,6 +136,60 @@ db.on('open', function callback(){
 	// 	response.end(JSON.stringify(data));
 	// }).listen(8124);
 });
+
+var parseTrades = function(data){
+    var mID = data.marketid;
+    var trades = data.recenttrades;
+    Trades.findOne({'marketid':mID}).sort('-tradeid').exec(function(err, lastTrade){
+        var newLeanTrades = [];
+        if (lastTrade) {
+            var stopID = lastTrade.tradeid;
+            for (var i = 0; i < trades.length; i++) {
+                if (trades[i].id > stopID) {
+                    newLeanTrades.push({
+                        "marketid":mID,
+                        "price":trades[i].price,
+                        "date":trades[i].time,
+                        "amount":trades[i].total,
+                        "tradeid":trades[i].id
+                    });
+                }
+                else {
+                    console.log("breaking");
+                    break;
+                }
+            }
+            //console.log("# of new = "+ newLeanTrades.length);
+            if (newLeanTrades.length > 0) {
+                Trades.create(newLeanTrades, function(err){
+                    if (err)
+                        console.log("Error "+ err);
+                    else
+                        console.log("saved "+ newLeanTrades.length +" new trades for mID "+ mID);
+                });
+
+            }
+        }
+        else {
+            //console.log("nothing found");
+            for (var i = 0; i < trades.length; i++) {
+                newLeanTrades.push({
+                    "marketid":mID,
+                    "price":trades[i].price,
+                    "date":trades[i].time,
+                    "amount":trades[i].total,
+                    "tradeid":trades[i].id
+                });
+            }
+            //console.log("# of new = "+ newLeanTrades.length);
+            Trades.create(newLeanTrades, function(err){
+                if (err) console.log("Error "+ err);
+                else console.log("saved "+ newLeanTrades.length +"new trades for mID "+ mID);
+            });
+        }
+    });
+
+}
 
 var runUpdate = function (thisMarket) {
     Market.findOne({'label':thisMarket.label}, function(err, foundMarket){
