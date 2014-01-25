@@ -124,10 +124,8 @@ db.on('open', function callback(){
         var timeInterval = 60000;
         var numberIntervals = 100;
         var now = new Date();
-        console.log("Now is " + now.getTime());
         var start = new Date(now - timeInterval*numberIntervals);
         var roundedStart = new Date(Math.floor(start.getTime()/timeInterval)*timeInterval);
-        console.log("here's the rounded Start "+roundedStart);
         Trades.find({'marketid':14, 'date':{$gt: roundedStart }}, function (err, trades){
             if (trades){
                 trades.sort(function(a, b){
@@ -137,12 +135,8 @@ db.on('open', function callback(){
                 //to fill in open/close etc if the earliest interval has no trades,
                 //query the database for the most recent trade before the earliest interval and use its price
                 Trades.findOne({'marketid':14, 'date':{$lt: roundedStart}}).sort('-tradeid').exec(function(err, lastTrade){
-                    console.log("done reverse check");
-                    console.log(lastTrade);
-                    console.log("was that");
                     if(lastTrade) {
                         var result = formatCandlesticks(timeInterval, numberIntervals, roundedStart, trades, lastTrade.price);
-                        //response.write();
                         response.end(JSON.stringify(result));
                     }
                     else {
