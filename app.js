@@ -156,6 +156,7 @@ var formatCandlesticks = function(interval, numInterval, startDate, trades, held
         return a.tradeid - b.tradeid;
     });
     var length = trades.length;
+    console.log("format candles. Found "+length+" trades. Held price = "+ heldPrice);
     for (var i = 0; i < length; i++) {
         //iterate through trades
         if (new Date(trades[i].date).getTime() < nextDate.getTime()) {
@@ -226,14 +227,10 @@ var formatCandlesticks = function(interval, numInterval, startDate, trades, held
 var parseTrades = function(data){
     var mID = data.marketid;
     var trades = data.recenttrades;
-
     var test = -1;
-    console.log('here');
     Trades.findOne({'marketid':mID}).sort('-tradeid').exec(function(err, lastTrade){
         if(err)
             console.log(err);
-        else
-            console.log("and here");
         var newLeanTrades = [];
         if (lastTrade) {
             var stopID = lastTrade.tradeid;
@@ -267,7 +264,7 @@ var parseTrades = function(data){
                 console.log("No new tradesDD");
         }
         else {
-            //console.log("nothing found");
+            console.log("nothing found");
             for (var i = 0; i < trades.length; i++) {
                 newLeanTrades.push({
                     "marketid":mID,
