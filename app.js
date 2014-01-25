@@ -249,6 +249,8 @@ var parseTrades = function(data){
             for (var i = 0; i < trades.length; i++) {
                 if (trades[i].id > stopID) {
                     test++;
+
+                    console.log("Raw time = " + trades[i].time);
                     newLeanTrades.push({
                         "marketid":mID,
                         "price":trades[i].price,
