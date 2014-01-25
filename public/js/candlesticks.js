@@ -18,23 +18,22 @@ var data = [];
 var baseurl = 'http://localhost:2500';
 
 $.get(baseurl+'/WDC', function(data, status){
-    //$('#body').html(data);
+
     var array = JSON.parse(data);
-    console.log(data);
-    //console.log(array);
-    //buildChart(array);
-    var pickyPicky = [];
-    for (var key in array){
-        var omg = [5];
-        omg[0] = array[key].date;
-        omg[1] = array[key].open;
-        omg[2] = array[key].high;
-        omg[3] = array[key].low;
-        omg[4] = array[key].close;
-        pickyPicky.push(omg);
-    }
-    console.log(pickyPicky);
-    buildOtherChart(pickyPicky);
+    buildChart(array);
+
+//    var pickyPicky = [];
+//    for (var key in array){
+//        var omg = [5];
+//        omg[0] = array[key].date;
+//        omg[1] = array[key].open;
+//        omg[2] = array[key].high;
+//        omg[3] = array[key].low;
+//        omg[4] = array[key].close;
+//        pickyPicky.push(omg);
+//    }
+    //console.log(pickyPicky);
+    //buildOtherChart(pickyPicky);
 });
 
 //$.get(baseurl+'/helloData', function(data, status){
@@ -46,9 +45,8 @@ function min(a, b){ return a < b ? a : b ; }
 function max(a, b){ return a > b ? a : b; }
 
 function buildChart(data){
-    console.log(data);
+    //console.log(data);
     var margin = 50;
-
     var chart = d3.select("#chart")
         .append("svg:svg")
         .attr("class", "chart")
@@ -65,8 +63,6 @@ function buildChart(data){
             return new Date(d.date).getTime();
         }))])
         .range([margin,width-margin]);
-    console.log(x);
-
     chart.selectAll("line.x")
         .data(x.ticks(10))
         .enter().append("svg:line")
@@ -112,29 +108,39 @@ function buildChart(data){
         .data(data)
         .enter().append("svg:rect")
         .attr("x", function(d) {
-            return new Date(d.date).getTime(); })
-        .attr("y", function(d) {return y(max(d.open, d.close));})
+            var thing = x(new Date(d.date).getTime());
+            //console.log(thing);
+            return thing;
+        })
+        .attr("y", function(d) {
+            //console.log(y(max(d.open, d.close)));
+            console.log("open = "+ d.open+"  close = "+ d.close);
+            return y(max(d.open, d.close));
+        })
         .attr("height", function(d) { return y(min(d.open, d.close))-y(max(d.open, d.close));})
         .attr("width", function(d) { return 0.5 * (width - 2*margin)/data.length; })
-        .attr("fill",function(d) { return d.open > d.close ? "red" : "green" ;});
+        .attr("fill",function(d) { return d.open > d.close ? "red" : "green" ;})
+        .style("stroke", "#000000").style("stroke-width", 1);
 
-    chart.selectAll("line.stem")
-        .data(data)
-        .enter().append("svg:line")
-        .attr("class", "stem")
-        .attr("x1", function(d) { return x(d.date) + 0.25 * (width - 2 * margin)/ data.length;})
-        .attr("x2", function(d) { return x(d.date) + 0.25 * (width - 2 * margin)/ data.length;})
-        .attr("y1", function(d) { return y(d.high);})
-        .attr("y2", function(d) { return y(d.low); })
-        .attr("stroke", function(d){ return d.open > d.close ? "red" : "green"; })
+
+    //todo: lines
+//    chart.selectAll("line.stem")
+//        .data(data)
+//        .enter().append("svg:line")
+//        .attr("class", "stem")
+//        .attr("x1", function(d) { return x(d.date) + 0.25 * (width - 2 * margin)/ data.length;})
+//        .attr("x2", function(d) { return x(d.date) + 0.25 * (width - 2 * margin)/ data.length;})
+//        .attr("y1", function(d) { return y(d.high);})
+//        .attr("y2", function(d) { return y(d.low); })
+//        .attr("stroke", function(d){ return d.open > d.close ? "red" : "green"; })
 
 }
 var buildOtherChart = function(data) {
     //console.log(data);
     var $playground = $("#chart");
     var COL={date:0,open:1,high:2,low:3,close:4};
-    var min=Math.min.apply(Math,data.map(ƒ(COL.low))),
-        max=Math.max.apply(Math,data.map(ƒ(COL.high))),
+    var min=Math.min.apply(Math,data.map(shorty(COL.low))),
+        max=Math.max.apply(Math,data.map(shorty(COL.high))),
         vscale=($playground.offsetHeight-20)/(max-min);
 
     console.log("min = "+ min + "  and max = "+ max);
@@ -203,7 +209,7 @@ function appendToData(x){
 
 // Create a function that returns a particular property of its parameter.
 // If that property is a function, invoke it (and pass optional params).
-function ƒ(name){
+function shorty(name){
   var v,params=Array.prototype.slice.call(arguments,1);
   return function(o){
     return (typeof (v=o[name])==='function' ? v.apply(o,params) : v );

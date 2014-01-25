@@ -125,10 +125,16 @@ db.on('open', function callback(){
             //query the database for the most recent trade before the earliest interval and use its price
             Trades.findOne({'marketid':14, 'date':{$lt: roundedStart}}).sort('-tradeid').exec(function(err, lastTrade){
                 console.log("done reverse check");
-                //todo: handle null error for new market
-                var result = formatCandlesticks(timeInterval, numberIntervals, roundedStart, trades, lastTrade.price);
-                response.write(JSON.stringify(result));
-                response.end();
+                if(lastTrade) {
+                    var result = formatCandlesticks(timeInterval, numberIntervals, roundedStart, trades, lastTrade.price);
+                    //response.write();
+                    response.end(JSON.stringify(result));
+                }
+                else {
+                    response.write("reaching too far back");
+                    response.end();
+                    //todo: handle notifying client how many intervals will actually be sent
+                }
             });
         });
     });
@@ -156,15 +162,22 @@ var formatCandlesticks = function(interval, numInterval, startDate, trades, held
             currentSet.push(trades[i].price);
         }
         else {
-            var open = heldPrice;
-            var close = heldPrice;
-            var high = heldPrice;
-            var low = heldPrice;
+//            var open = heldPrice;
+//            var close = heldPrice;
+//            var high = heldPrice;
+//            var low = heldPrice;
+            var open, close, low, high;
             if (currentSet.length > 0) {
                 open = currentSet[0];
                 close = currentSet[currentSet.length-1];
                 high = Math.max.apply( Math, currentSet );
                 low = Math.min.apply(Math, currentSet);
+            }
+            else {
+                open = heldPrice;
+                close = heldPrice;
+                high = heldPrice;
+                low = heldPrice;
             }
             toSend.push({
                 "high":high,
@@ -173,6 +186,7 @@ var formatCandlesticks = function(interval, numInterval, startDate, trades, held
                 "close":close,
                 "date":currentDate
             });
+            currentSet = [];
             heldPrice = close;
             currentDate = new Date(currentDate.getTime() + interval);
             nextDate = new Date(nextDate.getTime() + interval);

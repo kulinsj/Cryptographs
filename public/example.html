@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <script type="text/javascript" src="http://d3js.org/d3.v2.min.js"></script>
-    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+      <script type="text/javascript" src="js/d3.v3.min.js"></script>
+    <script type="text/javascript" src="js/jquery2.0.3.min.js"></script>
   </head>
   <body>
 
@@ -29,7 +29,7 @@
       function max(a, b){ return a > b ? a : b; }    
 
       function buildChart(data){
-          console.log(data);
+          //console.log(data);
          
           var margin = 50;		   
 		  
@@ -43,11 +43,13 @@
 		  .domain([d3.min(data.map(function(x) {return x["Low"];})), d3.max(data.map(function(x){return x["High"];}))])
 		  .range([height-margin, margin]);
 	  var x = d3.scale.linear()
-		  .domain([d3.min(data.map(function(d){return d.timestamp;})), d3.max(data.map(function(d){ return d.timestamp;}))])
+		  .domain([d3.min(data.map(function(d){
+                  return d.timestamp;
+              })), d3.max(data.map(function(d){ return d.timestamp;}))])
 		  .range([margin,width-margin]);
 
           chart.selectAll("line.x")
-           .data(x.ticks(10))
+           .data(x.ticks(12))
            .enter().append("svg:line")
            .attr("class", "x")
            .attr("x1", x)
@@ -67,7 +69,7 @@
            .attr("stroke", "#ccc");
 
           chart.selectAll("text.xrule")
-           .data(x.ticks(10))
+           .data(x.ticks(12))
            .enter().append("svg:text")
            .attr("class", "xrule")
            .attr("x", x)
@@ -90,8 +92,15 @@
 	chart.selectAll("rect")
 	  .data(data)
 	  .enter().append("svg:rect")
-	  .attr("x", function(d) { return x(d.timestamp); })
-          .attr("y", function(d) {return y(max(d.Open, d.Close));})		  
+	  .attr("x", function(d) {
+                //console.log(d.timestamp);
+                var thing = x(d.timestamp);
+                //console.log(thing);
+            return thing;
+        })
+          .attr("y", function(d) {
+                console.log(y(max(d.Open, d.Close)));
+                return y(max(d.Open, d.Close));})
 	  .attr("height", function(d) { return y(min(d.Open, d.Close))-y(max(d.Open, d.Close));})
 	  .attr("width", function(d) { return 0.5 * (width - 2*margin)/data.length; })
           .attr("fill",function(d) { return d.Open > d.Close ? "red" : "green" ;});
@@ -110,7 +119,6 @@
 
 
       function appendToData(x){
-    console.log(x);
 	if(data.length > 0){
 	    return;
         }

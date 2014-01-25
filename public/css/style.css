@@ -11,6 +11,7 @@ html {
     min-width: 600px;
     min-height: 400px;
 }
+
 #chart div { box-sizing:border-box; -moz-box-sizing:border-box; }
 .box {
 	display:inline-block;
