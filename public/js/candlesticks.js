@@ -44,7 +44,7 @@ function buildChart(data){
         })), d3.max(data.map(function(d){
             return new Date(d.date).getTime();
         }))])
-        .range([margin,width-margin]);
+        .range([margin,width-margin-40]);
     chart.selectAll("line.x")
         .data(x.ticks(10))
         .enter().append("svg:line")
@@ -60,7 +60,7 @@ function buildChart(data){
         .enter().append("svg:line")
         .attr("class", "y")
         .attr("x1", margin)
-        .attr("x2", width - margin)
+        .attr("x2", width - margin-40)
         .attr("y1", y)
         .attr("y2", y)
         .attr("stroke", "#ccc");
@@ -98,12 +98,15 @@ function buildChart(data){
         .data(y.ticks(10))
         .enter().append("svg:text")
         .attr("class", "yrule")
-        .attr("x", width - margin)
+        .attr("x", width - margin-15)
         .attr("y", y)
         .attr("dy", 0)
         .attr("dx", 20)
         .attr("text-anchor", "middle")
-        .text(String);
+        .text(function(d){
+            return d.toFixed(8);
+        });
+        //.text(String);
 
     chart.selectAll("rect")
         .data(data)
