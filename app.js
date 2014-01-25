@@ -259,7 +259,7 @@ var parseTrades = function(data){
                 });
             }
             else
-                console.log("No new trades");
+                console.log("No new tradesDD");
         }
         else {
             //console.log("nothing found");
