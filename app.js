@@ -11,11 +11,13 @@ var theport = process.env.PORT || 2500;
 app.use('/', express.static(__dirname + '/public'));
 
 var WDC_Market_url = 'http://pubapi.cryptsy.com/api.php?method=singlemarketdata&marketid=14';
-mongoose.connect(uristring, function(){
-    mongoose.connection.db.dropDatabase();
-    console.log("DROPPED");
-});
+mongoose.connect(uristring);
 //var allURL = 'http://pubapi.cryptsy.com/api.php?method=marketdatav2';
+
+//mongoose.connect(uristring, function(){
+//    mongoose.connection.db.dropDatabase();
+//    console.log("DROPPED");
+//});
 
 var MarketSchema = mongoose.Schema({
     	marketid: Number,
