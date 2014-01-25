@@ -115,12 +115,12 @@ db.on('open', function callback(){
         var now = new Date();
         var start = new Date(now - timeInterval*numberIntervals);
         var roundedStart = new Date(Math.floor(start.getTime()/timeInterval)*timeInterval);
-
+        
         Trades.find({'marketid':14, 'date':{$gt: roundedStart }}, function (err, trades){
             trades.sort(function(a, b){
                 return a.tradeid - b.tradeid;
             });
-            console.log("found initial batch.");
+            console.log("found initial batch of " + trades.length+ " trades");
             //to fill in open/close etc if the earliest interval has no trades,
             //query the database for the most recent trade before the earliest interval and use its price
             Trades.findOne({'marketid':14, 'date':{$lt: roundedStart}}).sort('-tradeid').exec(function(err, lastTrade){
