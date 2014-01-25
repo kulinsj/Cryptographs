@@ -11,9 +11,7 @@ var theport = process.env.PORT || 2500;
 app.use('/', express.static(__dirname + '/public'));
 
 var WDC_Market_url = 'http://pubapi.cryptsy.com/api.php?method=singlemarketdata&marketid=14';
-mongoose.connect(uristring, function(err){
-    console.log(err);
-});
+mongoose.connect(uristring, function(err){if(err) console.log(err);});
 //var allURL = 'http://pubapi.cryptsy.com/api.php?method=marketdatav2';
 
 //mongoose.connect(uristring, function(){
@@ -122,7 +120,7 @@ db.on('open', function callback(){
         var now = new Date();
         var start = new Date(now - timeInterval*numberIntervals);
         var roundedStart = new Date(Math.floor(start.getTime()/timeInterval)*timeInterval);
-
+        console.log("here's the rounded Start "+roundedStart);
         Trades.find({'marketid':14, 'date':{$gt: roundedStart }}, function (err, trades){
             if (trades){
                 trades.sort(function(a, b){
@@ -191,8 +189,6 @@ var formatCandlesticks = function(interval, numInterval, startDate, trades, held
                 high = heldPrice;
                 low = heldPrice;
             }
-            console.log("null if unfollowed");
-            console.log("open = "+open+"  close = "+ close);
             toSend.push({
                 "high":high,
                 "low":low,
