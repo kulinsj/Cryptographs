@@ -118,6 +118,7 @@ db.on('open', function callback(){
         var timeInterval = 60000;
         var numberIntervals = 100;
         var now = new Date();
+        console.log("Now is " + now.getTime());
         var start = new Date(now - timeInterval*numberIntervals);
         var roundedStart = new Date(Math.floor(start.getTime()/timeInterval)*timeInterval);
         console.log("here's the rounded Start "+roundedStart);
@@ -256,7 +257,7 @@ var parseTrades = function(data){
                         "tradeid":trades[i].id
                     });
                     console.log("Here");
-                    console.log("price = "+ newLeanTrades[test].price);
+                    console.log("price = "+ newLeanTrades[test].price + " Time is "+ new Date(newLeanTrades[test].date).getTime());
                 }
                 else
                     break;
