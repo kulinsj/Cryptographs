@@ -2,6 +2,12 @@ var mongoose = require('mongoose');
 var http = require('http');
 var express = require('express');
 var app = express();
+var onServer;
+if (process.env.MONGOLAB_URI || process.env.MONGOHQ_URL)
+    onServer = true;
+else
+    onServer = false;
+console.log(onServer?"On Server":"On local");
 var uristring =
     process.env.MONGOLAB_URI ||
     process.env.MONGOHQ_URL ||
@@ -249,7 +255,7 @@ var parseTrades = function(data){
             for (var i = 0; i < trades.length; i++) {
                 if (trades[i].id > stopID) {
                     test++;
-
+                    //todo here
                     console.log("Raw time = " + trades[i].time);
                     newLeanTrades.push({
                         "marketid":mID,
@@ -280,6 +286,7 @@ var parseTrades = function(data){
         else {
             console.log("nothing found");
             for (var i = 0; i < trades.length; i++) {
+                //todo here
                 newLeanTrades.push({
                     "marketid":mID,
                     "price":trades[i].price,
