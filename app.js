@@ -256,15 +256,20 @@ var parseTrades = function(data){
                 if (trades[i].id > stopID) {
                     test++;
                     //todo here
+                    var date = new Date(trades[i].time).getTime();
+                    if (onServer){
+                        var newDate = new Date(new Date(trades[i].time).getTime()+ 18000000);
+                        date = newDate.getTime();
+                        console.log("adjusted the date to "+date);
+                    }
                     console.log("Raw time = " + trades[i].time);
                     newLeanTrades.push({
                         "marketid":mID,
                         "price":trades[i].price,
-                        "date":trades[i].time,
+                        "date":date,
                         "amount":trades[i].total,
                         "tradeid":trades[i].id
                     });
-                    console.log("Here");
                     console.log("price = "+ newLeanTrades[test].price + " Time is "+ new Date(newLeanTrades[test].date).getTime());
                 }
                 else
@@ -281,16 +286,22 @@ var parseTrades = function(data){
                 });
             }
             else
-                console.log("No new tradesDD");
+                console.log("No new trades");
         }
         else {
             console.log("nothing found");
             for (var i = 0; i < trades.length; i++) {
                 //todo here
+                var date = new Date(trades[i].time).getTime();
+                if (onServer){
+                    var newDate = new Date(new Date(trades[i].time).getTime()+ 18000000);
+                    date = newDate.getTime();
+                }
+
                 newLeanTrades.push({
                     "marketid":mID,
                     "price":trades[i].price,
-                    "date":trades[i].time,
+                    "date":date,
                     "amount":trades[i].total,
                     "tradeid":trades[i].id
                 });
