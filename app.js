@@ -255,22 +255,18 @@ var parseTrades = function(data){
             for (var i = 0; i < trades.length; i++) {
                 if (trades[i].id > stopID) {
                     test++;
-                    //todo here
-                    var date = new Date(trades[i].time).getTime();
+                    var date1 = new Date(trades[i].time).getTime();
                     if (onServer){
-                        var newDate = new Date(new Date(trades[i].time).getTime()+ 18000000);
-                        date = newDate.getTime();
-                        console.log("adjusted the date to "+date);
+                        //Adjust by 5 hours for time offset b/w Cryptsy and Heroku
+                        date1 = new Date(new Date(trades[i].time).getTime()+ 18000000).getTime();
                     }
-                    console.log("Raw time = " + trades[i].time);
                     newLeanTrades.push({
                         "marketid":mID,
                         "price":trades[i].price,
-                        "date":date,
+                        "date":date1,
                         "amount":trades[i].total,
                         "tradeid":trades[i].id
                     });
-                    console.log("price = "+ newLeanTrades[test].price + " Time is "+ new Date(newLeanTrades[test].date).getTime());
                 }
                 else
                     break;
@@ -291,13 +287,11 @@ var parseTrades = function(data){
         else {
             console.log("nothing found");
             for (var i = 0; i < trades.length; i++) {
-                //todo here
                 var date = new Date(trades[i].time).getTime();
                 if (onServer){
-                    var newDate = new Date(new Date(trades[i].time).getTime()+ 18000000);
-                    date = newDate.getTime();
+                    //Adjust by 5 hours for time offset b/w Cryptsy and Heroku
+                    date = new Date(new Date(trades[i].time).getTime()+ 18000000).getTime();
                 }
-
                 newLeanTrades.push({
                     "marketid":mID,
                     "price":trades[i].price,
