@@ -162,10 +162,6 @@ var formatCandlesticks = function(interval, numInterval, startDate, trades, held
             currentSet.push(trades[i].price);
         }
         else {
-//            var open = heldPrice;
-//            var close = heldPrice;
-//            var high = heldPrice;
-//            var low = heldPrice;
             var open, close, low, high;
             if (currentSet.length > 0) {
                 open = currentSet[0];
@@ -179,6 +175,7 @@ var formatCandlesticks = function(interval, numInterval, startDate, trades, held
                 high = heldPrice;
                 low = heldPrice;
             }
+            console.log("open = "+open+"  close = "+ close);
             toSend.push({
                 "high":high,
                 "low":low,
