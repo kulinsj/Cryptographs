@@ -13,7 +13,8 @@ var end = new Date();
 var start = new Date(end.getTime() - 1000 * 60 * 60 * 24 * 60);
 var data = [];
 
-var baseurl = 'http://cryptographs.herokuapp.com';
+var baseurl = 'http://thisisthetestapp.herokuapp.com';
+//var baseurl = 'http://cryptographs.herokuapp.com';
 //var baseurl = 'http://localhost:2500';
 
 $.get(baseurl+'/WDC', function(data, status){
