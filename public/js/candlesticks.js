@@ -28,6 +28,7 @@ function min(a, b){ return a < b ? a : b ; }
 function max(a, b){ return a > b ? a : b; }
 
 function buildChart(data){
+    var timeRange = Math.abs((new Date(data[0].date).getTime()) - (new Date(data[data.length-1].date).getTime()));
     var margin = 50;
     var chart = d3.select("#chart")
         .append("svg:svg")
@@ -65,6 +66,7 @@ function buildChart(data){
         .attr("y2", y)
         .attr("stroke", "#ccc");
 
+    //TODO: adjust ticks based on time range
     chart.selectAll("text.xrule")
         .data(x.ticks(10))
         .enter().append("svg:text")
@@ -73,7 +75,25 @@ function buildChart(data){
         .attr("y", height - margin)
         .attr("dy", 20)
         .attr("text-anchor", "middle")
-        .text(function(d){ var date = new Date(d * 1000);  return (date.getMonth() + 1)+"/"+date.getDate(); });
+        .text(function(d){
+            var date = new Date(d);
+            if (timeRange < 1000*60*60*24) {
+                //less than 6 hours, format to minutes
+                var mins = date.getMinutes();
+                if (mins < 10)
+                    mins = "0"+mins;
+                return(date.getHours()+":"+mins);
+            }
+            else if (timeRange < 1000*60*60*24*7) {
+                //todo
+                //less than a week, format hours and days
+            }
+            else {
+                //todo
+                //more than a week, format day/month
+            }
+            return (date.getMonth() + 1)+"/"+date.getDate();
+        });
 
     chart.selectAll("text.yrule")
         .data(y.ticks(10))
