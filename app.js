@@ -84,7 +84,7 @@ db.on('open', function callback(){
                 // Buffer the body entirely for processing as a whole.
                 var bodyChunks = [];
                 res.on('data', function(chunk) {
-                    // You can process streamed parts here...
+                    // Process streamed parts here...
                     bodyChunks.push(chunk);
                 }).on('end', function() {
                     var body = Buffer.concat(bodyChunks);
@@ -131,7 +131,6 @@ db.on('open', function callback(){
                 trades.sort(function(a, b){
                     return a.tradeid - b.tradeid;
                 });
-                console.log("found initial batch of " + trades.length+ " trades");
                 //to fill in open/close etc if the earliest interval has no trades,
                 //query the database for the most recent trade before the earliest interval and use its price
                 Trades.findOne({'marketid':14, 'date':{$lt: roundedStart}}).sort('-tradeid').exec(function(err, lastTrade){
