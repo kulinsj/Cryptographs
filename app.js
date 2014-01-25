@@ -228,7 +228,12 @@ var parseTrades = function(data){
     var trades = data.recenttrades;
 
     var test = -1;
+    console.log('here');
     Trades.findOne({'marketid':mID}).sort('-tradeid').exec(function(err, lastTrade){
+        if(err)
+            console.log(err);
+        else
+            console.log("and here");
         var newLeanTrades = [];
         if (lastTrade) {
             var stopID = lastTrade.tradeid;
