@@ -175,6 +175,7 @@ var formatCandlesticks = function(interval, numInterval, startDate, trades, held
                 high = heldPrice;
                 low = heldPrice;
             }
+            console.log("null if unfollowed");
             console.log("open = "+open+"  close = "+ close);
             toSend.push({
                 "high":high,
