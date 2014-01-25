@@ -20,6 +20,7 @@ var baseurl = 'http://localhost:2500';
 $.get(baseurl+'/WDC', function(data, status){
     //$('#body').html(data);
     var array = JSON.parse(data);
+    console.log(data);
     //console.log(array);
     //buildChart(array);
     var pickyPicky = [];
@@ -32,19 +33,20 @@ $.get(baseurl+'/WDC', function(data, status){
         omg[4] = array[key].close;
         pickyPicky.push(omg);
     }
+    console.log(pickyPicky);
     buildOtherChart(pickyPicky);
 });
 
-$.get(baseurl+'/helloData', function(data, status){
-    console.log(data);
-});
+//$.get(baseurl+'/helloData', function(data, status){
+//    console.log(data);
+//});
 
 function min(a, b){ return a < b ? a : b ; }
 
 function max(a, b){ return a > b ? a : b; }
 
 function buildChart(data){
-
+    console.log(data);
     var margin = 50;
 
     var chart = d3.select("#chart")
@@ -170,6 +172,7 @@ function appendToData(x){
         data[i].timestamp = (new Date(data[i].Date).getTime() / 1000);
     }
     data = data.sort(function(x, y){ return x.timestamp - y.timestamp; });
+    console.log(tade);
     buildChart(data);
 }
 

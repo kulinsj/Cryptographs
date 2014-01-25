@@ -125,6 +125,7 @@ db.on('open', function callback(){
             //query the database for the most recent trade before the earliest interval and use its price
             Trades.findOne({'marketid':14, 'date':{$lt: roundedStart}}).sort('-tradeid').exec(function(err, lastTrade){
                 console.log("done reverse check");
+                //todo: handle null error for new market
                 var result = formatCandlesticks(timeInterval, numberIntervals, roundedStart, trades, lastTrade.price);
                 response.write(JSON.stringify(result));
                 response.end();
