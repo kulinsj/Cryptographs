@@ -226,12 +226,15 @@ var formatCandlesticks = function(interval, numInterval, startDate, trades, held
 var parseTrades = function(data){
     var mID = data.marketid;
     var trades = data.recenttrades;
+
+    var test = -1;
     Trades.findOne({'marketid':mID}).sort('-tradeid').exec(function(err, lastTrade){
         var newLeanTrades = [];
         if (lastTrade) {
             var stopID = lastTrade.tradeid;
             for (var i = 0; i < trades.length; i++) {
                 if (trades[i].id > stopID) {
+                    test++;
                     newLeanTrades.push({
                         "marketid":mID,
                         "price":trades[i].price,
@@ -239,6 +242,8 @@ var parseTrades = function(data){
                         "amount":trades[i].total,
                         "tradeid":trades[i].id
                     });
+                    console.log("Here");
+                    console.log("price = "+ newLeanTrades[test].price);
                 }
                 else
                     break;
@@ -248,8 +253,9 @@ var parseTrades = function(data){
                 Trades.create(newLeanTrades, function(err){
                     if (err)
                         console.log("Error "+ err);
-                    else
+                    else {
                         console.log("saved "+ newLeanTrades.length +" new trades for mID "+ mID);
+                    }
                 });
             }
             else
