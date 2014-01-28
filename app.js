@@ -107,41 +107,25 @@ db.on('open', function callback(){
 
     io.sockets.on('connection', function(socket){
         socket.on('ask', function(data){
-            console.log("Got client request");
-            var timeInterval = 60000;
-            var numberIntervals = 100;
-            var now = new Date();
-            var start = new Date(now - timeInterval*numberIntervals);
-            var roundedStart = new Date(Math.floor(start.getTime()/timeInterval)*timeInterval);
-            Trades.find({'marketid':14, 'date':{$gt: roundedStart }}, function (err, trades){
-                if (trades){
-                    trades.sort(function(a, b){
-                        return a.tradeid - b.tradeid;
-                    });
-                    //to fill in open/close etc if the earliest interval has no trades,
-                    //query the database for the most recent trade before the earliest interval and use its price
-                    Trades.findOne({'marketid':14, 'date':{$lt: roundedStart}}).sort('-tradeid').exec(function(err, lastTrade){
-                        if(lastTrade) {
-                            var result = formatCandlesticks(timeInterval, numberIntervals, roundedStart, trades, lastTrade.price);
-                            socket.emit('data', result);
-                            //response.end(JSON.stringify(result));
-                        }
-                        else {
-                            socket.emit('data', 'reaching too far back');
-                            //todo: handle notifying client how many intervals will actually be sent
-                        }
-                    });
-                }
-                else {
-                    console.log("no trades found");
-                }
-
-            });
+            var sendable = function(sendData){
+                socket.emit('data', sendData);
+            };
+            clientRequest(14, sendable);
         });
     });
 
+    app.get('/WDC', function(req, res){
+        var callback = function(result) {
+            res.end(JSON.stringify(result));
+        };
+        clientRequest(14, callback());
+    } );
+
+
     server.listen(theport);
-    console.log("The Port "+theport);
+    console.log("The Port "+ theport);
+
+    //todo: remove dead sockets
 });
 
 var formatCandlesticks = function(interval, numInterval, startDate, trades, heldPrice) {
@@ -359,6 +343,35 @@ var runUpdate = function (thisMarket) {
                 else
                     console.log('saved new market');
             });
+        }
+    });
+}
+
+function clientRequest(mID, callable) {
+    var timeInterval = 60000;
+    var numberIntervals = 100;
+    var now = new Date();
+    var start = new Date(now - timeInterval*numberIntervals);
+    var roundedStart = new Date(Math.floor(start.getTime()/timeInterval)*timeInterval);
+    Trades.find({'marketid':mID, 'date':{$gt: roundedStart }}, function (err, trades){
+        if (trades){
+            trades.sort(function(a, b){
+                return a.tradeid - b.tradeid;
+            });
+            //to fill in open/close etc if the earliest interval has no trades,
+            //query the database for the most recent trade before the earliest interval and use its price
+            Trades.findOne({'marketid':14, 'date':{$lt: roundedStart}}).sort('-tradeid').exec(function(err, lastTrade){
+                if(lastTrade) {
+                    callable(formatCandlesticks(timeInterval, numberIntervals, roundedStart, trades, lastTrade.price));
+                }
+                else {
+                    callable('reaching too far back');
+                    //todo: handle notifying client how many intervals will actually be sent
+                }
+            });
+        }
+        else {
+            callable('no trades found');
         }
     });
 }
