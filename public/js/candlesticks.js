@@ -18,8 +18,11 @@ var baseurl = 'http://cryptographs.herokuapp.com';
 
 var socket = io.connect(baseurl);
 
+socket.on('connect', function(){
+    socket.emit('ask');
+});
+
 socket.on('data', function(data){
-    console.log(data);
     buildChart(data);
 });
 
