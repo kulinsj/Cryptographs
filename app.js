@@ -16,7 +16,7 @@ var uristring =
     process.env.MONGOLAB_URI ||
     process.env.MONGOHQ_URL ||
     'mongodb://localhost/Markets2';
-var theport = 51178;
+var theport = process.env.PORT || 2500;
 
 app.use('/', express.static(__dirname + '/public'));
 
