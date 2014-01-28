@@ -141,6 +141,7 @@ db.on('open', function callback(){
     });
 
     server.listen(theport);
+    console.log("The Port "+theport);
 });
 
 var formatCandlesticks = function(interval, numInterval, startDate, trades, heldPrice) {
