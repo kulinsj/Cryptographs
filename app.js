@@ -2,12 +2,16 @@ var mongoose = require('mongoose');
 var http = require('http');
 var express = require('express');
 var app = express();
+var server = http.createServer(app);
+var io = require('socket.io').listen(server, { log: false });
+
 var onServer;
 if (process.env.MONGOLAB_URI || process.env.MONGOHQ_URL)
     onServer = true;
 else
     onServer = false;
 console.log(onServer?"On Server":"On local");
+
 var uristring =
     process.env.MONGOLAB_URI ||
     process.env.MONGOHQ_URL ||
@@ -19,11 +23,6 @@ app.use('/', express.static(__dirname + '/public'));
 var WDC_Market_url = 'http://pubapi.cryptsy.com/api.php?method=singlemarketdata&marketid=14';
 mongoose.connect(uristring, function(err){if(err) console.log(err);});
 //var allURL = 'http://pubapi.cryptsy.com/api.php?method=marketdatav2';
-
-//mongoose.connect(uristring, function(){
-//    mongoose.connection.db.dropDatabase();
-//    console.log("DROPPED");
-//});
 
 var MarketSchema = mongoose.Schema({
     	marketid: Number,
@@ -106,58 +105,42 @@ db.on('open', function callback(){
         }
     }, 20000);
 
-//    app.get('/', function(request, response){
-//        var timeInterval = 60000;
-//        var intervalCount = 360;
-//        var now = new Date();
-//        var start = now.getTime()- timeInterval*(intervalCount+1);
-//
-//        Market.findOne({'label':'WDC/BTC'}, function(err, foundMarket){
-//            //var toSend = formatDataToSend(foundMarket, 60000, 360);
-//            response.send('Hello World');
-//            response.end();
-//        });
-//    });
+    io.sockets.on('connection', function(socket){
+        socket.on('ask', function(data){
+            console.log("Got client request");
+            var timeInterval = 60000;
+            var numberIntervals = 100;
+            var now = new Date();
+            var start = new Date(now - timeInterval*numberIntervals);
+            var roundedStart = new Date(Math.floor(start.getTime()/timeInterval)*timeInterval);
+            Trades.find({'marketid':14, 'date':{$gt: roundedStart }}, function (err, trades){
+                if (trades){
+                    trades.sort(function(a, b){
+                        return a.tradeid - b.tradeid;
+                    });
+                    //to fill in open/close etc if the earliest interval has no trades,
+                    //query the database for the most recent trade before the earliest interval and use its price
+                    Trades.findOne({'marketid':14, 'date':{$lt: roundedStart}}).sort('-tradeid').exec(function(err, lastTrade){
+                        if(lastTrade) {
+                            var result = formatCandlesticks(timeInterval, numberIntervals, roundedStart, trades, lastTrade.price);
+                            socket.emit('data', result);
+                            //response.end(JSON.stringify(result));
+                        }
+                        else {
+                            socket.emit('data', 'reaching too far back');
+                            //todo: handle notifying client how many intervals will actually be sent
+                        }
+                    });
+                }
+                else {
+                    console.log("no trades found");
+                }
 
-    app.get('/WDC', function(request, response){
-        console.log("Got client request");
-        var timeInterval = 60000;
-        var numberIntervals = 100;
-        var now = new Date();
-        var start = new Date(now - timeInterval*numberIntervals);
-        var roundedStart = new Date(Math.floor(start.getTime()/timeInterval)*timeInterval);
-        Trades.find({'marketid':14, 'date':{$gt: roundedStart }}, function (err, trades){
-            if (trades){
-                trades.sort(function(a, b){
-                    return a.tradeid - b.tradeid;
-                });
-                //to fill in open/close etc if the earliest interval has no trades,
-                //query the database for the most recent trade before the earliest interval and use its price
-                Trades.findOne({'marketid':14, 'date':{$lt: roundedStart}}).sort('-tradeid').exec(function(err, lastTrade){
-                    if(lastTrade) {
-                        var result = formatCandlesticks(timeInterval, numberIntervals, roundedStart, trades, lastTrade.price);
-                        response.end(JSON.stringify(result));
-                    }
-                    else {
-                        response.write("reaching too far back");
-                        response.end();
-                        //todo: handle notifying client how many intervals will actually be sent
-                    }
-                });
-            }
-            else {
-                console.log("no trades found");
-            }
-
+            });
         });
     });
 
-    app.get('/helloData', function(request, response){
-        response.send("All your base are belong to us.");
-        response.end();
-    });
-
-    app.listen(theport);
+    server.listen(theport);
 });
 
 var formatCandlesticks = function(interval, numInterval, startDate, trades, heldPrice) {

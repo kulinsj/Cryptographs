@@ -16,10 +16,11 @@ var data = [];
 var baseurl = 'http://cryptographs.herokuapp.com';
 //var baseurl = 'http://localhost:2500';
 
-$.get(baseurl+'/WDC', function(data, status){
+var socket = io.connect(baseurl);
 
-    var array = JSON.parse(data);
-    buildChart(array);
+socket.on('data', function(data){
+    console.log(data);
+    buildChart(data);
 });
 
 function min(a, b){ return a < b ? a : b ; }

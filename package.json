@@ -9,7 +9,8 @@
   },
   "devDependencies": {
       "express" :"*",
-      "mongoose" : "*"
+      "mongoose" : "*",
+      "socket.io":"*"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
