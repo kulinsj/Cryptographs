@@ -14,7 +14,11 @@ var start = new Date(end.getTime() - 1000 * 60 * 60 * 24 * 60);
 var data = [];
 
 var baseurl = 'http://cryptographs.herokuapp.com';
-//var baseurl = 'http://localhost:51178';
+//var baseurl = 'http://localhost:2500';
+
+$.get(baseurl+'/WDC', function(data, status){
+    buildChart(JSON.parse(data));
+});
 
 var socket = io.connect(baseurl);
 
@@ -23,7 +27,8 @@ socket.on('connect', function(){
 });
 
 socket.on('data', function(data){
-    buildChart(data);
+    console.log("also got socket data");
+    //buildChart(data);
 });
 
 function min(a, b){ return a < b ? a : b ; }

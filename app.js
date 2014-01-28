@@ -118,7 +118,7 @@ db.on('open', function callback(){
         var callback = function(result) {
             res.end(JSON.stringify(result));
         };
-        clientRequest(14, callback());
+        clientRequest(14, callback);
     } );
 
 
