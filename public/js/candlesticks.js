@@ -105,8 +105,12 @@ function buildChart(data){
                 return(date.getHours()+":"+mins);
             }
             else if (timeRange < 1000*60*60*24*7) {
-                //todo
                 //less than a week, format hours and days
+                var mins = date.getMinutes();
+                if (mins < 10)
+                    mins = "0"+mins;
+                return(date.getHours()+":"+mins+"/"+date.getDate());
+
             }
             else {
                 //todo

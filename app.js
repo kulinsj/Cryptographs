@@ -190,7 +190,7 @@ var formatCandlesticks = function(interval, numInterval, startDate, trades, held
         }
     }
     //should be done here.
-    while (toSend.length < 100) {
+    while (toSend.length < numInterval) {
         toSend.push({
             "high":heldPrice,
             "low":heldPrice,
@@ -352,6 +352,7 @@ function clientRequest(mID, callable, timeInterval, numberIntervals) {
     var now = new Date();
     var start = new Date(now - timeInterval*numberIntervals);
     var roundedStart = new Date(Math.floor(start.getTime()/timeInterval)*timeInterval);
+    console.log(roundedStart.getTime());
     Trades.find({'marketid':mID, 'date':{$gt: roundedStart }}, function (err, trades){
         if (trades){
             trades.sort(function(a, b){
