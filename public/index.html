@@ -5,7 +5,13 @@
     <link rel="stylesheet" href="css/style.css"/>
 </head>
 <body id="body">
-
+<div id="controlsBar">
+    <label for="interval">Interval: </label><input class="short" type="text" value="2" name="interval" id="interval"> Minutes
+    <span class="horz-spacer short"></span>
+    <label for="numIntervals">Number of Intervals: </label><input class="short" value="100" type="text" name="numIntervals" id="numIntervals">
+    <span class="horz-spacer short"></span>
+    <div id="updateBtn">Update</div>
+</div>
 <div id="chart"></div>
 
 <script src="js/jquery2.0.3.min.js" type="text/javascript"></script>

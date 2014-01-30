@@ -110,15 +110,16 @@ db.on('open', function callback(){
             var sendable = function(sendData){
                 socket.emit('data', sendData);
             };
-            clientRequest(14, sendable);
+            clientRequest(14, sendable, 60000, 100);
         });
     });
 
     app.get('/WDC', function(req, res){
+        console.log(req.query);
         var callback = function(result) {
             res.end(JSON.stringify(result));
         };
-        clientRequest(14, callback);
+        clientRequest(14, callback, parseInt(req.query.interval), parseInt(req.query.numIntervals));
     } );
 
 
@@ -347,9 +348,7 @@ var runUpdate = function (thisMarket) {
     });
 }
 
-function clientRequest(mID, callable) {
-    var timeInterval = 60000;
-    var numberIntervals = 100;
+function clientRequest(mID, callable, timeInterval, numberIntervals) {
     var now = new Date();
     var start = new Date(now - timeInterval*numberIntervals);
     var roundedStart = new Date(Math.floor(start.getTime()/timeInterval)*timeInterval);

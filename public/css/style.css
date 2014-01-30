@@ -3,6 +3,29 @@ html {
     font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
     
 }
+
+
+input.short {
+    width: 50px;
+    text-align: center;
+}
+
+span.horz-spacer{
+    width: 50px;
+    display: inline-block;
+}
+
+#updateBtn{
+    display: inline-block;
+    cursor: pointer;
+    background: #bbb;
+    padding: 5px 10px;
+}
+
+#updateBtn:hover{
+    background: #aaa;
+}
+
 #chart {
     background:#eee;
     text-align:center;

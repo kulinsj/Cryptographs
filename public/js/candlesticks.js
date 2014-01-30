@@ -1,24 +1,19 @@
 var width = 900;
 var height = 500;
-String.prototype.format = function() {
-    var formatted = this;
-    for (var i = 0; i < arguments.length; i++) {
-        var regexp = new RegExp('\\{'+i+'\\}', 'gi');
-        formatted = formatted.replace(regexp, arguments[i]);
-    }
-    return formatted;
-};
 
 var end = new Date();
 var start = new Date(end.getTime() - 1000 * 60 * 60 * 24 * 60);
 var data = [];
 
-var baseurl = 'http://cryptographs.herokuapp.com';
-//var baseurl = 'http://localhost:2500';
+//var baseurl = 'http://cryptographs.herokuapp.com';
+var baseurl = 'http://localhost:2500';
 
-$.get(baseurl+'/WDC', function(data, status){
-    buildChart(JSON.parse(data));
-});
+$updateBtn = $("#updateBtn");
+$interval = $("#interval");
+$numInt = $("#numIntervals");
+$chartContainer = $("#chart");
+
+initial();
 
 var socket = io.connect(baseurl);
 
@@ -30,6 +25,23 @@ socket.on('data', function(data){
     console.log("also got socket data");
     //buildChart(data);
 });
+
+$updateBtn.click(function(){
+    $chartContainer.html('');
+    initial();
+});
+
+function initial(){
+    miliseconds = parseInt($interval.val())*1000*60;
+    var requestData = {
+        interval: miliseconds,
+        numIntervals: $numInt.val()
+    }
+    console.log(requestData);
+    $.get(baseurl+'/WDC',requestData, function(data, status){
+        buildChart(JSON.parse(data));
+    });
+}
 
 function min(a, b){ return a < b ? a : b ; }
 
