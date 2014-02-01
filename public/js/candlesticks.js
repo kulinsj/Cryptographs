@@ -3,7 +3,7 @@ var height = 500;
 
 var end = new Date();
 var start = new Date(end.getTime() - 1000 * 60 * 60 * 24 * 60);
-var data = [];
+var theData = [];
 
 var baseurl = 'http://cryptographs.herokuapp.com';
 //var baseurl = 'http://localhost:2500';
@@ -18,12 +18,17 @@ initial();
 var socket = io.connect(baseurl);
 
 socket.on('connect', function(){
-    socket.emit('ask');
+    socket.emit('ask',
+        {
+            marketid: 14,
+            interval: miliseconds = parseInt($interval.val())*1000*60,
+            numIntervals: $numInt.val()
+        }
+    );
 });
 
-socket.on('data', function(data){
-    console.log("also got socket data");
-    //buildChart(data);
+socket.on('newTrades', function(data){
+    console.log(data);
 });
 
 $updateBtn.click(function(){
@@ -37,9 +42,9 @@ function initial(){
         interval: miliseconds,
         numIntervals: $numInt.val()
     }
-    console.log(requestData);
     $.get(baseurl+'/WDC',requestData, function(data, status){
-        buildChart(JSON.parse(data));
+        theData = JSON.parse(data);
+        buildChart(theData);
     });
 }
 

@@ -6,10 +6,7 @@ var server = http.createServer(app);
 var io = require('socket.io').listen(server, { log: false });
 
 var onServer;
-if (process.env.MONGOLAB_URI || process.env.MONGOHQ_URL)
-    onServer = true;
-else
-    onServer = false;
+onServer = process.env.MONGOLAB_URI || process.env.MONGOHQ_URL;
 console.log(onServer?"On Server":"On local");
 
 var uristring =
@@ -64,6 +61,18 @@ var TradeSchema = mongoose.Schema({
 
 var Trades = mongoose.model('Trades', TradeSchema);
 
+//TODO: Migrate to candle storage
+var OneMinCandleSchema = mongoose.Schema({
+    marketid: Number,
+    date: Date,
+    open: Number,
+    close: Number,
+    high: Number,
+    low: Number,
+    volume: Number
+});
+var MinCandles = mongoose.model('MinCandles', OneMinCandleSchema);
+
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.on('open', function callback(){
@@ -91,8 +100,11 @@ db.on('open', function callback(){
                         var data = JSON.parse(body);
                         var name = data.return.markets;
                         for (var key in name) {
-                            parseTrades(name[key]);
-                            //runUpdate(name[key]);
+                            var callback = function(mID, data){
+                                console.log("emitting to sockets in MID" + mID);
+                                io.sockets.in(mID).emit('newTrades', {trades: data});
+                            };
+                            parseTrades(name[key], callback);
                         }
                     }
                     catch(e) {
@@ -106,16 +118,14 @@ db.on('open', function callback(){
     }, 20000);
 
     io.sockets.on('connection', function(socket){
+
         socket.on('ask', function(data){
-            var sendable = function(sendData){
-                socket.emit('data', sendData);
-            };
-            clientRequest(14, sendable, 60000, 100);
+            var mID = data.marketid;
+            socket.join(mID);
         });
     });
 
     app.get('/WDC', function(req, res){
-        console.log(req.query);
         var callback = function(result) {
             res.end(JSON.stringify(result));
         };
@@ -204,7 +214,7 @@ var formatCandlesticks = function(interval, numInterval, startDate, trades, held
     return (toSend);
 }
 
-var parseTrades = function(data){
+var parseTrades = function(data, callback){
     var mID = data.marketid;
     var trades = data.recenttrades;
     var test = -1;
@@ -240,6 +250,7 @@ var parseTrades = function(data){
                         console.log("Error "+ err);
                     else {
                         console.log("saved "+ newLeanTrades.length +" new trades for mID "+ mID);
+                        callback(mID, newLeanTrades);
                     }
                 });
             }
@@ -352,7 +363,6 @@ function clientRequest(mID, callable, timeInterval, numberIntervals) {
     var now = new Date();
     var start = new Date(now - timeInterval*numberIntervals);
     var roundedStart = new Date(Math.floor(start.getTime()/timeInterval)*timeInterval);
-    console.log(roundedStart.getTime());
     Trades.find({'marketid':mID, 'date':{$gt: roundedStart }}, function (err, trades){
         if (trades){
             trades.sort(function(a, b){
