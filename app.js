@@ -5,6 +5,8 @@ var app = express();
 var server = http.createServer(app);
 var io = require('socket.io').listen(server, { log: false });
 
+var MINUTE = 60000;
+
 var onServer;
 onServer = process.env.MONGOLAB_URI || process.env.MONGOHQ_URL;
 console.log(onServer?"On Server":"On local");
@@ -115,7 +117,7 @@ db.on('open', function callback(){
                 })
             });
         }
-    }, 20000);
+    }, 10000);
 
     io.sockets.on('connection', function(socket){
 
@@ -132,34 +134,30 @@ db.on('open', function callback(){
         clientRequest(14, callback, parseInt(req.query.interval), parseInt(req.query.numIntervals));
     } );
 
-
     server.listen(theport);
-    console.log("The Port "+ theport);
-
-    //todo: remove dead sockets
+    console.log("Listening on port "+ theport);
 });
 
-var formatCandlesticks = function(interval, numInterval, startDate, trades, heldPrice) {
+var formatCandlesticks = function(interval, numInterval, startDate, trades, heldPrice, mID) {
     var toSend = [];
     var currentDate = startDate;
-    var nextDate = new Date(currentDate + interval);
+    var nextDate = new Date(currentDate.getTime() + interval);
     var currentSet = [];
-    trades.sort(function(a, b){
-        return a.tradeid - b.tradeid;
-    });
+    var volume = 0;
     var length = trades.length;
-    console.log("format candles. Found "+length+" trades. Held price = "+ heldPrice);
+    console.log("format candles. Given "+length+" trades. Held price = "+ heldPrice);
     for (var i = 0; i < length; i++) {
         //iterate through trades
-        if (new Date(trades[i].date).getTime() < nextDate.getTime()) {
+        if (new Date(trades[i].time).getTime() < nextDate.getTime()) {
             currentSet.push(trades[i].price);
+            volume += trades[i].quantity;
         }
         else {
             var open, close, low, high;
             if (currentSet.length > 0) {
                 open = currentSet[0];
                 close = currentSet[currentSet.length-1];
-                high = Math.max.apply( Math, currentSet );
+                high = Math.max.apply( Math, currentSet);
                 low = Math.min.apply(Math, currentSet);
             }
             else {
@@ -169,29 +167,35 @@ var formatCandlesticks = function(interval, numInterval, startDate, trades, held
                 low = heldPrice;
             }
             toSend.push({
+                "volume":volume,
+                "marketid": mID,
                 "high":high,
                 "low":low,
                 "open":open,
                 "close":close,
-                "date":currentDate
+                "date":currentDate.getTime()
             });
             currentSet = [];
+            volume = 0;
             heldPrice = close;
             currentDate = new Date(currentDate.getTime() + interval);
             nextDate = new Date(nextDate.getTime() + interval);
             var placed = false;
             while (!placed) {
-                if (new Date(trades[i].date).getTime() < nextDate.getTime()) {
+                if (new Date(trades[i].time).getTime() < nextDate.getTime()) {
                     currentSet.push(trades[i].price);
+                    volume += trades[i].quantity;
                     placed = true;
                 }
                 else {
                     toSend.push({
+                        "volume":volume,
+                        "marketid": mID,
                         "high":heldPrice,
                         "low":heldPrice,
                         "open":heldPrice,
                         "close":heldPrice,
-                        "date":currentDate
+                        "date":currentDate.getTime()
                     });
                     currentDate = new Date(currentDate.getTime() + interval);
                     nextDate = new Date(nextDate.getTime() + interval);
@@ -199,14 +203,33 @@ var formatCandlesticks = function(interval, numInterval, startDate, trades, held
             }
         }
     }
+    if (currentSet.length > 0) {
+        //Push the last current set.
+        open = currentSet[0];
+        close = currentSet[currentSet.length-1];
+        high = Math.max.apply( Math, currentSet);
+        low = Math.min.apply(Math, currentSet);
+        toSend.push({
+            "volume":volume,
+            "marketid": mID,
+            "high":high,
+            "low":low,
+            "open":open,
+            "close":close,
+            "date":currentDate.getTime()
+        });
+    }
     //should be done here.
     while (toSend.length < numInterval) {
+        console.log("YO BITCH, THIS SHOULDN'T BE HIT");
         toSend.push({
+            "volume":0,
+            "marketid": mID,
             "high":heldPrice,
             "low":heldPrice,
             "open":heldPrice,
             "close":heldPrice,
-            "date":currentDate
+            "date":currentDate.getTime()
         });
         currentDate = new Date(currentDate.getTime() + interval);
         nextDate = new Date(nextDate.getTime() + interval);
@@ -217,7 +240,63 @@ var formatCandlesticks = function(interval, numInterval, startDate, trades, held
 var parseTrades = function(data, callback){
     var mID = data.marketid;
     var trades = data.recenttrades;
-    var test = -1;
+
+    trades.sort(function(a, b){
+        return a.id - b.id;
+    });
+
+    var length = trades.length;
+
+    if (length > 0) {
+        MinCandles.findOne({'marketid':mID}).sort('-tradeid').exec(function(err, lastCandle){
+            if(err) console.log(err);
+            if (lastCandle) {
+                console.log("original trades length = " + length);
+                var earliestUseful = lastCandle.date;
+                for (var i = 0; i < length; i++) {
+                    if (new Date(trades[i].time).getTime() >= earliestUseful ) {
+                        trades = trades.slice(i);
+                        break;
+                    }
+                }
+                length = trades.length;
+                console.log("trimmed trades length = " + length);
+
+                var numIntervals = getNumIntervalsForTrades(trades, MINUTE);
+                var heldPrice = lastCandle.close;
+
+                var newCandles = formatCandlesticks(MINUTE, numIntervals, new Date(earliestUseful), trades, heldPrice, mID);
+                console.log(newCandles);
+                console.log("First new Candle = " + newCandles[0]);
+                console.log("Last old Candle = " + lastCandle);
+            }
+            else {
+                console.log('no candles found');
+                //just start saving new ones
+
+                //round the earliest trade down to the nearest minute
+                var startDate = new Date(Math.floor(new Date(trades[0].time).getTime()/MINUTE)*MINUTE);
+
+                var numInterval = getNumIntervalsForTrades(trades, MINUTE);
+
+                var candles = formatCandlesticks(MINUTE, numInterval, startDate, trades, trades[0].price, mID);
+
+//                MinCandles.create(candles, function(err){
+//                    if (err) console.log("Error "+ err);
+//                    else console.log("saved "+ candles.length +"new candles for mID "+ mID);
+//                });
+            }
+        });
+    }
+
+
+
+
+
+
+
+
+
     Trades.findOne({'marketid':mID}).sort('-tradeid').exec(function(err, lastTrade){
         if(err)
             console.log(err);
@@ -226,7 +305,6 @@ var parseTrades = function(data, callback){
             var stopID = lastTrade.tradeid;
             for (var i = 0; i < trades.length; i++) {
                 if (trades[i].id > stopID) {
-                    test++;
                     var date1 = new Date(trades[i].time).getTime();
                     if (onServer){
                         //Adjust by 5 hours for time offset b/w Cryptsy and Heroku
@@ -280,7 +358,14 @@ var parseTrades = function(data, callback){
             });
         }
     });
+}
 
+var getNumIntervalsForTrades = function (trades, interval) {
+    //round the earliest trade down to the nearest minute
+    var startDate = new Date(Math.floor(new Date(trades[0].time).getTime()/interval)*interval);
+    //round latest trade up to the nearest minute
+    var endDate = new Date(Math.ceil(new Date(trades[trades.length -1].time).getTime()/interval)*interval);
+    return (endDate.getTime() - startDate.getTime())/interval;
 }
 
 var runUpdate = function (thisMarket) {
@@ -370,9 +455,9 @@ function clientRequest(mID, callable, timeInterval, numberIntervals) {
             });
             //to fill in open/close etc if the earliest interval has no trades,
             //query the database for the most recent trade before the earliest interval and use its price
-            Trades.findOne({'marketid':14, 'date':{$lt: roundedStart}}).sort('-tradeid').exec(function(err, lastTrade){
+            Trades.findOne({'marketid':mID, 'date':{$lt: roundedStart}}).sort('-tradeid').exec(function(err, lastTrade){
                 if(lastTrade) {
-                    callable(formatCandlesticks(timeInterval, numberIntervals, roundedStart, trades, lastTrade.price));
+                    callable(formatCandlesticks(timeInterval, numberIntervals, roundedStart, trades, lastTrade.price, mID));
                 }
                 else {
                     callable('reaching too far back');
