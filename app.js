@@ -97,6 +97,7 @@ db.on('open', function callback(){
                     // Process streamed parts here...
                     bodyChunks.push(chunk);
                 }).on('end', function() {
+                        console.log(5);
                     var body = Buffer.concat(bodyChunks);
                     try {
                         var data = JSON.parse(body);
@@ -139,6 +140,8 @@ db.on('open', function callback(){
 });
 
 var formatCandlesticks = function(interval, numInterval, startDate, trades, heldPrice, mID) {
+    mID = parseInt(mID);
+    heldPrice = parseFloat(heldPrice);
     var toSend = [];
     var currentDate = startDate;
     var nextDate = new Date(currentDate.getTime() + interval);
@@ -150,13 +153,13 @@ var formatCandlesticks = function(interval, numInterval, startDate, trades, held
         //iterate through trades
         if (new Date(trades[i].time).getTime() < nextDate.getTime()) {
             currentSet.push(trades[i].price);
-            volume += trades[i].quantity;
+            volume += parseFloat(trades[i].quantity);
         }
         else {
             var open, close, low, high;
             if (currentSet.length > 0) {
-                open = currentSet[0];
-                close = currentSet[currentSet.length-1];
+                open = parseFloat(currentSet[0]);
+                close = parseFloat(currentSet[currentSet.length-1]);
                 high = Math.max.apply( Math, currentSet);
                 low = Math.min.apply(Math, currentSet);
             }
@@ -184,7 +187,7 @@ var formatCandlesticks = function(interval, numInterval, startDate, trades, held
             while (!placed) {
                 if (new Date(trades[i].time).getTime() < nextDate.getTime()) {
                     currentSet.push(trades[i].price);
-                    volume += trades[i].quantity;
+                    volume += parseFloat(trades[i].quantity);
                     placed = true;
                 }
                 else {
@@ -205,8 +208,8 @@ var formatCandlesticks = function(interval, numInterval, startDate, trades, held
     }
     if (currentSet.length > 0) {
         //Push the last current set.
-        open = currentSet[0];
-        close = currentSet[currentSet.length-1];
+        open = parseFloat(currentSet[0]);
+        close = parseFloat(currentSet[currentSet.length-1]);
         high = Math.max.apply( Math, currentSet);
         low = Math.min.apply(Math, currentSet);
         toSend.push({
@@ -246,11 +249,13 @@ var parseTrades = function(data, callback){
     });
 
     var length = trades.length;
-
+    console.log(1);
     if (length > 0) {
         MinCandles.findOne({'marketid':mID}).sort('-tradeid').exec(function(err, lastCandle){
+            console.log(2);
             if(err) console.log(err);
             if (lastCandle) {
+                console.log("found existing candle(s)");
                 console.log("original trades length = " + length);
                 var earliestUseful = lastCandle.date;
                 for (var i = 0; i < length; i++) {
@@ -266,9 +271,23 @@ var parseTrades = function(data, callback){
                 var heldPrice = lastCandle.close;
 
                 var newCandles = formatCandlesticks(MINUTE, numIntervals, new Date(earliestUseful), trades, heldPrice, mID);
-                console.log(newCandles);
-                console.log("First new Candle = " + newCandles[0]);
+                //console.log(newCandles);
+
+                //todo: only merge if the dates agree
+
+                console.log("First new CandleLow = " + newCandles[0].low);
+                console.log("First new CandleHigh = " + newCandles[0].high);
+                console.log("First new CandleVol = " + newCandles[0].volume);
+                console.log("First new CandleDate = " + new Date(newCandles[0].date));
                 console.log("Last old Candle = " + lastCandle);
+
+                lastCandle.low = Math.min(lastCandle.low, newCandles[0].low);
+                lastCandle.high = Math.max(lastCandle.high, newCandles[0].high);
+                lastCandle.volume = newCandles[0].volume;
+
+                console.log("merged candle = " + lastCandle);
+
+
             }
             else {
                 console.log('no candles found');
@@ -281,23 +300,16 @@ var parseTrades = function(data, callback){
 
                 var candles = formatCandlesticks(MINUTE, numInterval, startDate, trades, trades[0].price, mID);
 
-//                MinCandles.create(candles, function(err){
-//                    if (err) console.log("Error "+ err);
-//                    else console.log("saved "+ candles.length +"new candles for mID "+ mID);
-//                });
+                MinCandles.create(candles, function(err){
+                    if (err) console.log("Error "+ err);
+                    else console.log("saved "+ candles.length +"new candles for mID "+ mID);
+                });
             }
         });
     }
-
-
-
-
-
-
-
-
-
+console.log(3);
     Trades.findOne({'marketid':mID}).sort('-tradeid').exec(function(err, lastTrade){
+        console.log(4);
         if(err)
             console.log(err);
         var newLeanTrades = [];
