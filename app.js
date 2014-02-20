@@ -14,7 +14,7 @@ console.log(onServer?"On Server":"On local");
 var uristring =
     process.env.MONGOLAB_URI ||
     process.env.MONGOHQ_URL ||
-    'mongodb://localhost/Markets3';
+    'mongodb://localhost/Markets5';
 var theport = process.env.PORT || 2500;
 
 app.use('/', express.static(__dirname + '/public'));
@@ -99,7 +99,7 @@ db.on('open', function callback(){
     console.log("Listening on port "+ theport);
 });
 
-var parseTrades = function(data){
+function parseTrades(data){
     var mID = parseInt(data.marketid);
     var trades = data.recenttrades;
     trades.sort(function(a, b){
@@ -108,28 +108,59 @@ var parseTrades = function(data){
 
     var numTrades = trades.length;
     if (numTrades > 0) {
-        MinCandles.findOne({'marketid':mID}).sort('-tradeid').exec(function(err, lastCandle){
+        MinCandles.findOne({'marketid':mID}).sort('-time').exec(function(err, lastCandle){
             //Attempt to find the most recent candle for this marketID.
             if(err) console.log(err);
 
             if (lastCandle) {
-                console.log('found existing ' + mID + 'candles');
                 //not the first time this market is being updated
+                console.log('found existing candles for mID = ' +  mID);
+                var earliestUseful = lastCandle.time;
+                for (var i = 0; i < numTrades; i++) {
+                    if (new Date(trades[i].time).getTime() >= earliestUseful ) {
+                        trades = trades.slice(i);
+                        break;
+                    }
+                }
+                numTrades = trades.length;
+                console.log("trimmed trades length = " + numTrades);
+                var newCandles = formatCandles(mID, MINUTE, trades, lastCandle.close);
+
+                lastCandle.low = Math.min(lastCandle.low, newCandles[0].low);
+                lastCandle.high = Math.max(lastCandle.high, newCandles[0].high);
+                lastCandle.volume = newCandles[0].volume;
+                lastCandle.save(function(err){
+                    if (err) console.log("Error updating existing lastCandle");
+                    else console.log("Updated existing lastCandle");
+                });
+                if (newCandles.length > 1) {
+                    newCandles = newCandles.slice(1);
+                    MinCandles.create(newCandles, function(err){
+                        if (err) console.log("Error "+ err);
+                        else console.log("saved "+ newCandles.length +" new candles for mID "+ mID);
+                    });
+                }
             }
 
             else {
-                console.log("first mID = "+ mID+" ever.");
                 //first time ever for this market
+                console.log("first mID = "+ mID+" ever.");
+                var candles = formatCandles(mID, MINUTE, trades, null);
+
+                MinCandles.create(candles, function(err){
+                    if (err) console.log("Error "+ err);
+                    else console.log("saved "+ candles.length +" new candles for mID "+ mID);
+                });
             }
         });
     }
 };
 
 function formatCandles(mID, interval, trades, heldPrice) {
-    // Note: maintain all date vars as getTime() timestamps
     // Note: assume trades are sorted, that trades[0] is the oldest
-    var currentDateStamp = new Date(Math.floor(new Date(trades[0].time).getTime()/MINUTE)*MINUTE).getTime();
-    var nextDateStamp = new Date(currentDateStamp + interval).getTime();
+    var currentDate = new Date(Math.floor(new Date(trades[0].time).getTime()/MINUTE)*MINUTE);
+    // Note: only keep "nextDateStamp" as a stamp
+    var nextDateStamp = new Date(currentDate.getTime() + interval).getTime();
 
     var returnable = [];
     var currentSet = [];
@@ -169,20 +200,19 @@ function formatCandles(mID, interval, trades, heldPrice) {
                 "low":low,
                 "open":open,
                 "close":close,
-                "date":currentDateStamp
+                "time":currentDate
             });
             //clean up
             currentSet = [];
             volume = 0;
             //set up for next set
             heldPrice = close;
-            currentDateStamp += interval;
+            currentDate = new Date(currentDate.getTime() + interval);
             nextDateStamp += interval;
 
             //loop forward in time until current iterate is placed
             var placed = false;
             while (!placed) {
-                console.log("while");
                 if (tradeTimeStamp < nextDateStamp) {
                     currentSet.push(parseFloat(trades[i].price));
                     volume += parseFloat(trades[i].quantity);
@@ -196,9 +226,9 @@ function formatCandles(mID, interval, trades, heldPrice) {
                         "low":heldPrice,
                         "open":heldPrice,
                         "close":heldPrice,
-                        "date":currentDateStamp
+                        "time":currentDate
                     });
-                    currentDateStamp += interval;
+                    currentDate = new Date(currentDate.getTime() + interval);
                     nextDateStamp += interval;
                 }
             }
@@ -217,7 +247,7 @@ function formatCandles(mID, interval, trades, heldPrice) {
             "low":low,
             "open":open,
             "close":close,
-            "date":currentDateStamp
+            "time":currentDate
         });
     }
     //All given trades were formatted to minCandles
