@@ -14,7 +14,7 @@ console.log(onServer?"On Server":"On local");
 var uristring =
     process.env.MONGOLAB_URI ||
     process.env.MONGOHQ_URL ||
-    'mongodb://localhost/Markets2';
+    'mongodb://localhost/Markets3';
 var theport = process.env.PORT || 2500;
 
 app.use('/', express.static(__dirname + '/public'));
@@ -25,7 +25,7 @@ mongoose.connect(uristring, function(err){if(err) console.log(err);});
 
 var OneMinCandleSchema = mongoose.Schema({
     marketid: Number,
-    date: Date,
+    time: Date,
     open: Number,
     close: Number,
     high: Number,
@@ -61,7 +61,7 @@ db.on('open', function callback(){
                                 console.log("emitting to sockets in MID" + mID);
                                 io.sockets.in(mID).emit('newTrades', {trades: data});
                             };*/
-                            //parseTrades(name[key], callback);
+                            parseTrades(name[key]);
                         }
                     }
                     else
@@ -99,3 +99,127 @@ db.on('open', function callback(){
     console.log("Listening on port "+ theport);
 });
 
+var parseTrades = function(data){
+    var mID = parseInt(data.marketid);
+    var trades = data.recenttrades;
+    trades.sort(function(a, b){
+        return a.id - b.id;
+    });
+
+    var numTrades = trades.length;
+    if (numTrades > 0) {
+        MinCandles.findOne({'marketid':mID}).sort('-tradeid').exec(function(err, lastCandle){
+            //Attempt to find the most recent candle for this marketID.
+            if(err) console.log(err);
+
+            if (lastCandle) {
+                console.log('found existing ' + mID + 'candles');
+                //not the first time this market is being updated
+            }
+
+            else {
+                console.log("first mID = "+ mID+" ever.");
+                //first time ever for this market
+            }
+        });
+    }
+};
+
+function formatCandles(mID, interval, trades, heldPrice) {
+    // Note: maintain all date vars as getTime() timestamps
+    // Note: assume trades are sorted, that trades[0] is the oldest
+    var currentDateStamp = new Date(Math.floor(new Date(trades[0].time).getTime()/MINUTE)*MINUTE).getTime();
+    var nextDateStamp = new Date(currentDateStamp + interval).getTime();
+
+    var returnable = [];
+    var currentSet = [];
+    var volume = 0;
+
+    var numTrades = trades.length;
+    for (var i = 0; i < numTrades; i++) {
+        var tradeTimeStamp = new Date(trades[i].time).getTime();
+
+        if (tradeTimeStamp < nextDateStamp) {
+            // current trade iterate belongs to current set
+            currentSet.push(parseFloat(trades[i].price));
+            volume += parseFloat(trades[i].quantity);
+        }
+
+        else {
+            // close the current set and add current iterate to a new one
+            var open, close, low, high;
+            if (currentSet.length > 0) {
+                open = currentSet[0];
+                close = currentSet[currentSet.length-1];
+                high = Math.max.apply( Math, currentSet);
+                low = Math.min.apply(Math, currentSet);
+            }
+            else {
+                // note: for a new mID, this should not be hit on i = 0, since the start time of the
+                // first current set is set such that trades[0] gets placed there.
+                open = heldPrice;
+                close = heldPrice;
+                high = heldPrice;
+                low = heldPrice;
+            }
+            returnable.push({
+                "volume":volume,
+                "marketid": mID,
+                "high":high,
+                "low":low,
+                "open":open,
+                "close":close,
+                "date":currentDateStamp
+            });
+            //clean up
+            currentSet = [];
+            volume = 0;
+            //set up for next set
+            heldPrice = close;
+            currentDateStamp += interval;
+            nextDateStamp += interval;
+
+            //loop forward in time until current iterate is placed
+            var placed = false;
+            while (!placed) {
+                console.log("while");
+                if (tradeTimeStamp < nextDateStamp) {
+                    currentSet.push(parseFloat(trades[i].price));
+                    volume += parseFloat(trades[i].quantity);
+                    placed = true;
+                }
+                else {
+                    returnable.push({
+                        "volume":volume,
+                        "marketid": mID,
+                        "high":heldPrice,
+                        "low":heldPrice,
+                        "open":heldPrice,
+                        "close":heldPrice,
+                        "date":currentDateStamp
+                    });
+                    currentDateStamp += interval;
+                    nextDateStamp += interval;
+                }
+            }
+        }
+    }
+    if (currentSet.length > 0) {
+        //Push the last current set.
+        open = currentSet[0];
+        close = currentSet[currentSet.length-1];
+        high = Math.max.apply( Math, currentSet);
+        low = Math.min.apply(Math, currentSet);
+        returnable.push({
+            "volume":volume,
+            "marketid": mID,
+            "high":high,
+            "low":low,
+            "open":open,
+            "close":close,
+            "date":currentDateStamp
+        });
+    }
+    //All given trades were formatted to minCandles
+    return(returnable);
+}
