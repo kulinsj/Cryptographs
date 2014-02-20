@@ -22,3 +22,44 @@ app.use('/', express.static(__dirname + '/public'));
 var WDC_Market_url = 'http://pubapi.cryptsy.com/api.php?method=singlemarketdata&marketid=14';
 mongoose.connect(uristring, function(err){if(err) console.log(err);});
 //var allURL = 'http://pubapi.cryptsy.com/api.php?method=marketdatav2';
+
+var OneMinCandleSchema = mongoose.Schema({
+    marketid: Number,
+    date: Date,
+    open: Number,
+    close: Number,
+    high: Number,
+    low: Number,
+    volume: Number
+});
+
+var MinCandles = mongoose.model('MinCandles', OneMinCandleSchema);
+
+var db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
+db.on('open', function callback(){
+    console.log('connected to mongoose');
+
+    setInterval(function(){
+
+    },10000);
+
+    io.sockets.on('connection', function(socket){
+        socket.on('ask', function(data){
+            socket.join(data.marketid);
+        });
+        //TODO: send updates to sockets
+    });
+
+    app.get('/WDC', function(req, res){
+        res.end('check one');
+        //TODO: provide initial data
+        /*var callback = function(result) {
+            res.end(JSON.stringify(result));
+        };*/
+    } );
+
+    server.listen(theport);
+    console.log("Listening on port "+ theport);
+});
+
