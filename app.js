@@ -42,43 +42,47 @@ db.on('open', function callback(){
     var APIfuckUpCount = 0;
     setInterval(function(){
         console.log('running GET '+ new Date().toLocaleTimeString());
-        http.get(allCryptsyURL, function(res) {
-            console.log('got response '+ new Date().toLocaleTimeString());
+        try{
+            http.get(allCryptsyURL, function(res) {
+                console.log('got response '+ new Date().toLocaleTimeString());
 
-            // Buffer the body entirely for processing as a whole.
-            var bodyChunks = [];
-            res.on('data', function(chunk){bodyChunks.push(chunk);}).on('end', function() {
-                var body = Buffer.concat(bodyChunks);
-                try {
-                    var data = JSON.parse(body);
-                    var dataPresent = data.return;
-                    if (dataPresent) {
-                        APIfuckUpCount = 0;
-                        var name = data.return.markets;
+                // Buffer the body entirely for processing as a whole.
+                var bodyChunks = [];
+                res.on('data', function(chunk){bodyChunks.push(chunk);}).on('end', function() {
+                    var body = Buffer.concat(bodyChunks);
+                    try {
+                        var data = JSON.parse(body);
+                        var dataPresent = data.return;
+                        if (dataPresent) {
+                            APIfuckUpCount = 0;
+                            var name = data.return.markets;
 
-                        for (var key in name) {
-                            //TODO: emit new trades to sockets
-//                            var callback = function(mID, data){
-//                                console.log("emitting to sockets in MID" + mID);
-//                                io.sockets.in(mID).emit('newTrades', {trades: data});
-//                            };
-                            parseTrades(name[key]);
+                            for (var key in name) {
+//                                TODO: emit new trades to sockets
+//                                var callback = function(mID, data){
+//                                    console.log("emitting to sockets in MID" + mID);
+//                                    io.sockets.in(mID).emit('newTrades', {trades: data});
+//                                };
+                                parseTrades(name[key]);
+                            }
                         }
+                        else
+                            console.log("API Fuck up. Count = " + ++APIfuckUpCount);
                     }
-                    else
+                    catch(e) {
                         console.log("API Fuck up. Count = " + ++APIfuckUpCount);
-                }
-                catch(e) {
-                    console.log("API Fuck up. Count = " + ++APIfuckUpCount);
-                    if (e instanceof SyntaxError){
-                        console.log("502 Bad Gateway");
+                        if (e instanceof SyntaxError){
+                            console.log("502 Bad Gateway");
+                        }
+                        else
+                            console.log('caught error: '+ e);
                     }
-                    else
-                        console.log('caught error: '+ e);
-                }
-            })
-        });
-
+                })
+            });
+        }
+        catch(e){
+           console.log("Dead Internet");
+        }
     },20000);
 
     io.sockets.on('connection', function(socket){
