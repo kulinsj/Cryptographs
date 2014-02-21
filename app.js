@@ -19,9 +19,8 @@ var theport = process.env.PORT || 2500;
 
 app.use('/', express.static(__dirname + '/public'));
 
-var WDC_Market_url = 'http://pubapi.cryptsy.com/api.php?method=singlemarketdata&marketid=14';
 mongoose.connect(uristring, function(err){if(err) console.log(err);});
-//var allURL = 'http://pubapi.cryptsy.com/api.php?method=marketdatav2';
+var allCryptsyURL = 'http://pubapi.cryptsy.com/api.php?method=marketdatav2';
 
 var OneMinCandleSchema = mongoose.Schema({
     marketid: Number,
@@ -43,7 +42,7 @@ db.on('open', function callback(){
     var APIfuckUpCount = 0;
     setInterval(function(){
         console.log('running GET '+ new Date().toLocaleTimeString());
-        http.get(WDC_Market_url, function(res) {
+        http.get(allCryptsyURL, function(res) {
             console.log('got response '+ new Date().toLocaleTimeString());
 
             // Buffer the body entirely for processing as a whole.
@@ -56,12 +55,13 @@ db.on('open', function callback(){
                     if (dataPresent) {
                         APIfuckUpCount = 0;
                         var name = data.return.markets;
+
                         for (var key in name) {
                             //TODO: emit new trades to sockets
-                            /*var callback = function(mID, data){
-                                console.log("emitting to sockets in MID" + mID);
-                                io.sockets.in(mID).emit('newTrades', {trades: data});
-                            };*/
+//                            var callback = function(mID, data){
+//                                console.log("emitting to sockets in MID" + mID);
+//                                io.sockets.in(mID).emit('newTrades', {trades: data});
+//                            };
                             parseTrades(name[key]);
                         }
                     }
@@ -79,7 +79,7 @@ db.on('open', function callback(){
             })
         });
 
-    },10000);
+    },20000);
 
     io.sockets.on('connection', function(socket){
         socket.on('ask', function(data){
@@ -119,7 +119,6 @@ function parseTrades(data){
 
             if (lastCandle) {
                 //not the first time this market is being updated
-                console.log('found existing candles for mID = ' +  mID);
                 var earliestUsefulID = lastCandle.lastTradeID;
                 for (var i = 0; i < numTrades; i++) {
                     if (parseInt(trades[i].id) > earliestUsefulID ) {
@@ -132,7 +131,6 @@ function parseTrades(data){
                     }
                 }
                 numTrades = trades.length;
-                console.log("trimmed trades length = " + numTrades);
                 if (numTrades > 0) {
                     var newCandles = formatCandles(mID, MINUTE, trades, lastCandle.close);
                     if (new Date(newCandles[0].time).getTime() == new Date(lastCandle.time).getTime()) {
@@ -143,7 +141,7 @@ function parseTrades(data){
                         lastCandle.lastTradeID = newCandles[0].lastTradeID;
                         lastCandle.save(function(err){
                             if (err) console.log("Error updating existing lastCandle");
-                            else console.log("Updated existing lastCandle");
+                            else console.log("Updated existing lastCandle for mID " + mID);
                         });
                         if (newCandles.length > 1) {
                             newCandles = newCandles.slice(1);
