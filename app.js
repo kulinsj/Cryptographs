@@ -134,6 +134,7 @@ function parseTrades(data){
                 }
                 numTrades = trades.length;
                 if (numTrades > 0) {
+                    console.log("Time Zone Offset = " + new Date(trades[0].time).getTimezoneOffset());
                     var newCandles = formatCandles(mID, MINUTE, trades, lastCandle.close);
                     if (new Date(newCandles[0].time).getTime() == new Date(lastCandle.time).getTime()) {
                         //first new candle needs to be merged
