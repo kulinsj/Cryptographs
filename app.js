@@ -90,7 +90,11 @@ db.on('open', function callback(){
     app.get('/SingleMarket', function(req, res){
         var mID = req.query.mID;
         console.log('Client initial GET for market ' + mID);
-        var Tminus5h = new Date((new Date().getTime())-2*60*60*1000);
+        var Tminus5h;
+        if (onServer) // adjust for silliness with heroku and cryptsy
+            Tminus5h = new Date((new Date().getTime())-7*60*60*1000);
+        else
+            Tminus5h = new Date((new Date().getTime())-2*60*60*1000);
         MinCandles.find({marketid:mID}).where('time').gt(Tminus5h).exec(function(err, candles){
             res.end(JSON.stringify(candles));
         });

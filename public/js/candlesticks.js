@@ -41,14 +41,16 @@ function initial(){
 }
 
 function verifyData(theData) {
-    //check for gaps in the data
-    var currentMinute = new Date(theData[0].time).getMinutes();
-    for (var i = 0; i < theData.length; i++){
-        if (currentMinute != new Date(theData[i].time).getMinutes())
-            console.log("Data minute Gap");
-        currentMinute++;
-        if (currentMinute == 60)
-            currentMinute = 0;
+    if (theData.length > 0){
+        //check for gaps in the data
+        var currentMinute = new Date(theData[0].time).getMinutes();
+        for (var i = 0; i < theData.length; i++){
+            if (currentMinute != new Date(theData[i].time).getMinutes())
+                console.log("Data minute Gap");
+            currentMinute++;
+            if (currentMinute == 60)
+                currentMinute = 0;
+        }
     }
 }
 
