@@ -152,7 +152,7 @@ function parseTrades(data){
                             newCandles = newCandles.slice(1);
                             MinCandles.create(newCandles, function(err){
                                 if (err) console.log("Error "+ err);
-                                else console.log("saved "+ newCandles.length +" new candles for mID "+ mID + " with merge");
+                                //else console.log("saved "+ newCandles.length +" new candles for mID "+ mID + " with merge");
                             });
                         }
                     }
@@ -184,7 +184,7 @@ function parseTrades(data){
                             newCandles = gapFillerCandles.concat(newCandles);
                         MinCandles.create(newCandles, function(err){
                             if (err) console.log("Error "+ err);
-                            else console.log("saved "+ newCandles.length +" new candles for mID "+ mID + " with "+fillerCount+" fillers");
+                            //else console.log("saved "+ newCandles.length +" new candles for mID "+ mID + " with "+fillerCount+" fillers");
                         });
                     }
                 }
