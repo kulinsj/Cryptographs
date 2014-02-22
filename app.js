@@ -14,7 +14,7 @@ console.log(onServer?"On Server":"On local");
 var uristring =
     process.env.MONGOLAB_URI ||
     process.env.MONGOHQ_URL ||
-    'mongodb://localhost/Markets11';
+    'mongodb://localhost/Markets13';
 var theport = process.env.PORT || 2500;
 
 app.use('/', express.static(__dirname + '/public'));
@@ -42,7 +42,6 @@ db.on('open', function callback(){
     var APIfuckUpCount = 0;
     setInterval(function(){
         console.log('running GET '+ new Date().toLocaleTimeString());
-        try{
             http.get(allCryptsyURL, function(res) {
                 console.log('got response '+ new Date().toLocaleTimeString());
 
@@ -79,11 +78,7 @@ db.on('open', function callback(){
                     }
                 })
             });
-        }
-        catch(e){
-           console.log("Dead Internet");
-        }
-    },20000);
+    },30000);
 
     io.sockets.on('connection', function(socket){
         socket.on('ask', function(data){
@@ -93,15 +88,12 @@ db.on('open', function callback(){
     });
 
     app.get('/SingleMarket', function(req, res){
-        console.log('Client initial GET');
         var mID = req.query.mID;
-        //var interval
-        console.log(req.query);
-        res.end('check one');
-        //TODO: provide initial data
-        /*var callback = function(result) {
-            res.end(JSON.stringify(result));
-        };*/
+        console.log('Client initial GET for market ' + mID);
+        var Tminus5h = new Date((new Date().getTime())-2*60*60*1000);
+        MinCandles.find({marketid:mID}).where('time').gt(Tminus5h).exec(function(err, candles){
+            res.end(JSON.stringify(candles));
+        });
     } );
 
     server.listen(theport);
@@ -124,14 +116,16 @@ function parseTrades(data){
             if (lastCandle) {
                 //not the first time this market is being updated
                 var earliestUsefulID = lastCandle.lastTradeID;
-                for (var i = 0; i < numTrades; i++) {
-                    if (parseInt(trades[i].id) > earliestUsefulID ) {
-                        trades = trades.slice(i);
-                        break;
-                    }
-                    if (i == numTrades - 1){
-                        //got to the end without satusfying the condition no new trades
-                        trades = [];
+                if (parseInt(trades[numTrades-1].id) == lastCandle.lastTradeID) {
+                    trades = []; // no new trades
+                }
+                else if ((parseInt(trades[0].id) < earliestUsefulID)) {
+                    //something useful, but need to trim
+                    for (var i = 0; i < numTrades; i++) {
+                        if (parseInt(trades[i].id) > earliestUsefulID ) {
+                            trades = trades.slice(i);
+                            break;
+                        }
                     }
                 }
                 numTrades = trades.length;
@@ -156,6 +150,33 @@ function parseTrades(data){
                         }
                     }
                     else {
+                        var startDateStamp = new Date(lastCandle.time).getTime() + MINUTE;
+                        var endDateStamp = new Date(newCandles[0].time).getTime() - MINUTE;
+
+                        var fillerCount = 0;
+                        if (endDateStamp >= startDateStamp) {
+                            //need to fill the gap in the data
+                            var gapFillerCandles = [];
+                            var heldPrice = lastCandle.close;
+                            for (var t = startDateStamp; t <= endDateStamp; t += MINUTE) {
+                                fillerCount++;
+                                gapFillerCandles.push({
+                                    "volume":0,
+                                    "marketid": mID,
+                                    "high":heldPrice,
+                                    "low":heldPrice,
+                                    "open":heldPrice,
+                                    "close":heldPrice,
+                                    "time":new Date(t),
+                                    "lastTradeID":lastCandle.lastTradeID
+                                });
+
+                            }
+                        }
+                        if (fillerCount > 0) {
+                            newCandles = gapFillerCandles.concat(newCandles);
+                            console.log('Created ' + fillerCount + ' filler candles for mID '+ mID);
+                        }
                         MinCandles.create(newCandles, function(err){
                             if (err) console.log("Error "+ err);
                             else console.log("saved "+ newCandles.length +" new candles for mID "+ mID);
@@ -176,9 +197,9 @@ function parseTrades(data){
             }
         });
     }
-};
+}
 
-function formatCandles(mID, interval, trades, heldPrice) {
+function formatCandles(mID, interval, trades, heldPrice){
     // Note: assume trades are sorted, that trades[0] is the oldest
     var currentDate = new Date(Math.floor(new Date(trades[0].time).getTime()/MINUTE)*MINUTE);
     // Note: only keep "nextDateStamp" as a stamp

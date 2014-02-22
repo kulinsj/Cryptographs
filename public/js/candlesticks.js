@@ -9,27 +9,19 @@ var baseurl = 'http://cryptographs.herokuapp.com';
 //var baseurl = 'http://localhost:2500';
 
 $updateBtn = $("#updateBtn");
-$interval = $("#interval");
-$numInt = $("#numIntervals");
+$mid = $("#mid");
 $chartContainer = $("#chart");
 
 initial();
 
-var socket = io.connect(baseurl);
-
-socket.on('connect', function(){
-    socket.emit('ask',
-        {
-            marketid: 14,
-            interval: miliseconds = parseInt($interval.val())*1000*60,
-            numIntervals: $numInt.val()
-        }
-    );
-});
-
-socket.on('newTrades', function(data){
-    console.log(data);
-});
+//var socket = io.connect(baseurl);
+//socket.on('connect', function(){
+//    socket.emit('ask',{ marketid: 14 });
+//});
+//
+//socket.on('newTrades', function(data){
+//    console.log(data);
+//});
 
 $updateBtn.click(function(){
     $chartContainer.html('');
@@ -37,13 +29,21 @@ $updateBtn.click(function(){
 });
 
 function initial(){
-    miliseconds = parseInt($interval.val())*1000*60;
-    var requestData = {
-        interval: miliseconds,
-        numIntervals: $numInt.val()
-    }
-    $.get(baseurl+'/WDC',requestData, function(data, status){
+    var requestData = { mID: $mid.val() };
+    $.get(baseurl+'/SingleMarket',requestData, function(data, status){
         theData = JSON.parse(data);
+        theData.sort(function(a,b){
+            return new Date(a.time).getTime() - new Date(b.time).getTime();
+        });
+        //check for gaps in the data
+        var currentMinute = new Date(theData[0].time).getMinutes();
+        for (var i = 0; i < theData.length; i++){
+            if (currentMinute != new Date(theData[i].time).getMinutes())
+                console.log("Data minute Gap");
+            currentMinute++;
+            if (currentMinute == 60)
+                currentMinute = 0;
+        }
         buildChart(theData);
     });
 }
@@ -53,7 +53,7 @@ function min(a, b){ return a < b ? a : b ; }
 function max(a, b){ return a > b ? a : b; }
 
 function buildChart(data){
-    var timeRange = Math.abs((new Date(data[0].date).getTime()) - (new Date(data[data.length-1].date).getTime()));
+    var timeRange = Math.abs((new Date(data[0].time).getTime()) - (new Date(data[data.length-1].time).getTime()));
     var margin = 50;
     var chart = d3.select("#chart")
         .append("svg:svg")
@@ -66,9 +66,9 @@ function buildChart(data){
         .range([height-margin, margin]);
     var x = d3.scale.linear()
         .domain([d3.min(data.map(function(d){
-            return new Date(d.date).getTime();
+            return new Date(d.time).getTime();
         })), d3.max(data.map(function(d){
-            return new Date(d.date).getTime();
+            return new Date(d.time).getTime();
         }))])
         .range([margin,width-margin-40]);
     chart.selectAll("line.x")
@@ -142,7 +142,7 @@ function buildChart(data){
         .data(data)
         .enter().append("svg:rect")
         .attr("x", function(d) {
-            return x(new Date(d.date).getTime());
+            return x(new Date(d.time).getTime());
         })
         .attr("y", function(d) {
             return y(max(d.open, d.close));
@@ -166,10 +166,10 @@ function buildChart(data){
         .enter().append("svg:line")
         .attr("class", "stem")
         .attr("x1", function(d) {
-            return x(new Date(d.date).getTime()) + 0.25 * (width - 2 * margin)/ data.length;
+            return x(new Date(d.time).getTime()) + 0.25 * (width - 2 * margin)/ data.length;
         })
         .attr("x2", function(d) {
-            return x(new Date(d.date).getTime()) + 0.25 * (width - 2 * margin)/ data.length;
+            return x(new Date(d.time).getTime()) + 0.25 * (width - 2 * margin)/ data.length;
         })
         .attr("y1", function(d) {
             return y(d.high);
@@ -187,7 +187,7 @@ function appendToData(x){
     }
     data = x.query.results.quote;
     for(var i=0;i<data.length;i++){
-        data[i].timestamp = (new Date(data[i].Date).getTime() / 1000);
+        data[i].timestamp = (new Date(data[i].time).getTime() / 1000);
     }
     data = data.sort(function(x, y){ return x.timestamp - y.timestamp; });
     console.log(tade);
