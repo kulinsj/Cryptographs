@@ -35,17 +35,21 @@ function initial(){
         theData.sort(function(a,b){
             return new Date(a.time).getTime() - new Date(b.time).getTime();
         });
-        //check for gaps in the data
-        var currentMinute = new Date(theData[0].time).getMinutes();
-        for (var i = 0; i < theData.length; i++){
-            if (currentMinute != new Date(theData[i].time).getMinutes())
-                console.log("Data minute Gap");
-            currentMinute++;
-            if (currentMinute == 60)
-                currentMinute = 0;
-        }
+        verifyData(theData);
         buildChart(theData);
     });
+}
+
+function verifyData(theData) {
+    //check for gaps in the data
+    var currentMinute = new Date(theData[0].time).getMinutes();
+    for (var i = 0; i < theData.length; i++){
+        if (currentMinute != new Date(theData[i].time).getMinutes())
+            console.log("Data minute Gap");
+        currentMinute++;
+        if (currentMinute == 60)
+            currentMinute = 0;
+    }
 }
 
 function min(a, b){ return a < b ? a : b ; }

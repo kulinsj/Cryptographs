@@ -139,13 +139,12 @@ function parseTrades(data){
                         lastCandle.lastTradeID = newCandles[0].lastTradeID;
                         lastCandle.save(function(err){
                             if (err) console.log("Error updating existing lastCandle");
-                            else console.log("Updated existing lastCandle for mID " + mID);
                         });
                         if (newCandles.length > 1) {
                             newCandles = newCandles.slice(1);
                             MinCandles.create(newCandles, function(err){
                                 if (err) console.log("Error "+ err);
-                                else console.log("saved "+ newCandles.length +" new candles for mID "+ mID);
+                                else console.log("saved "+ newCandles.length +" new candles for mID "+ mID + " with merge");
                             });
                         }
                     }
@@ -173,13 +172,11 @@ function parseTrades(data){
 
                             }
                         }
-                        if (fillerCount > 0) {
+                        if (fillerCount > 0)
                             newCandles = gapFillerCandles.concat(newCandles);
-                            console.log('Created ' + fillerCount + ' filler candles for mID '+ mID);
-                        }
                         MinCandles.create(newCandles, function(err){
                             if (err) console.log("Error "+ err);
-                            else console.log("saved "+ newCandles.length +" new candles for mID "+ mID);
+                            else console.log("saved "+ newCandles.length +" new candles for mID "+ mID + " with "+fillerCount+" fillers");
                         });
                     }
                 }
