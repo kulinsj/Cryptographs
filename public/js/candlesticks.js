@@ -48,7 +48,11 @@ function verifyData(theData) {
             //console.log(theData[i]);
             //console.log(theData[i].time);
             if (currentMinute != new Date(theData[i].time).getMinutes()) {
-                console.log("Data minute Gap = " + (new Date(theData[i].time).getMinutes() - currentMinute));
+                var gap = (new Date(theData[i].time).getMinutes() - currentMinute);
+                if (gap < 0)
+                    console.log("Data overlap for time = " + theData[i].time);
+                else
+                    console.log("Gap in the data.");
                 currentMinute = new Date(theData[i].time).getMinutes();
             }
 
