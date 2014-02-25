@@ -101,12 +101,8 @@ db.on('open', function callback(){
     app.get('/SingleMarket', function(req, res){
         var mID = req.query.mID;
         console.log('Client initial GET for market ' + mID);
-        var Tminus5h;
-        if (onServer) // adjust for silliness with heroku and cryptsy
-            Tminus5h = new Date((new Date().getTime())-7*60*60*1000);
-        else
-            Tminus5h = new Date((new Date().getTime())-2*60*60*1000);
-        MinCandles.find({marketid:mID}).where('time').gt(Tminus5h).exec(function(err, candles){
+        var Tminus3h = new Date((new Date().getTime())-3*60*60*1000);
+        MinCandles.find({marketid:mID}).where('time').gt(Tminus3h).exec(function(err, candles){
             res.end(JSON.stringify(candles));
         });
     } );
@@ -134,18 +130,12 @@ function parseTrades(data){
                 var earliestUsefulID = lastCandle.lastTradeID;
                 if (parseInt(trades[numTrades-1].id) == lastCandle.lastTradeID) {
                     trades = []; // no new trades
-                    if (mID == 14) {
-                        console.log("No New Trades");
-                    }
                 }
                 else if ((parseInt(trades[0].id) < earliestUsefulID)) {
                     //something useful, but need to trim
                     for (var i = 0; i < numTrades; i++) {
                         if (parseInt(trades[i].id) > earliestUsefulID ) {
                             trades = trades.slice(i);
-                            if (mID == 14) {
-                                console.log("Spliced at i = " + i);
-                            }
                             break;
                         }
                     }
@@ -156,10 +146,6 @@ function parseTrades(data){
                     //console.log("Trade 0 id = " + trades[0].id + " and time = "+trades[0].time + "  TS= "+ new Date(trades[0].time).getTime());
                     var newCandles = formatCandles(mID, MINUTE, trades, lastCandle.close);
                     if (new Date(newCandles[0].time).getTime() == new Date(lastCandle.time).getTime()) {
-                        if (mID == 14) {
-                            console.log("Last Candle");
-                            console.log(lastCandle);
-                        }
                         //first new candle needs to be merged
                         lastCandle.low = Math.min(lastCandle.low, newCandles[0].low);
                         lastCandle.high = Math.max(lastCandle.high, newCandles[0].high);
@@ -168,18 +154,8 @@ function parseTrades(data){
                         lastCandle.save(function(err){
                             if (err) console.log("Error updating existing lastCandle");
                         });
-                        if (mID == 14) {
-                            console.log("pre trim");
-                            console.log(newCandles);
-                        }
                         if (newCandles.length > 1) {
                             newCandles = newCandles.slice(1);
-
-                            if (mID == 14) {
-                                console.log("post trim");
-                                console.log(newCandles);
-                            }
-
                             MinCandles.create(newCandles, function(err){
                                 if (err) console.log("Error "+ err);
                                 //else console.log("saved "+ newCandles.length +" new candles for mID "+ mID + " with merge");
