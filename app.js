@@ -135,12 +135,18 @@ function parseTrades(data){
                 var earliestUsefulID = lastCandle.lastTradeID;
                 if (parseInt(trades[numTrades-1].id) == lastCandle.lastTradeID) {
                     trades = []; // no new trades
+                    if (mID == 14) {
+                        console.log("No New Trades");
+                    }
                 }
                 else if ((parseInt(trades[0].id) < earliestUsefulID)) {
                     //something useful, but need to trim
                     for (var i = 0; i < numTrades; i++) {
                         if (parseInt(trades[i].id) > earliestUsefulID ) {
                             trades = trades.slice(i);
+                            if (mID == 14) {
+                                console.log("Spliced at i = " + i);
+                            }
                             break;
                         }
                     }
@@ -151,6 +157,10 @@ function parseTrades(data){
                     //console.log("Trade 0 id = " + trades[0].id + " and time = "+trades[0].time + "  TS= "+ new Date(trades[0].time).getTime());
                     var newCandles = formatCandles(mID, MINUTE, trades, lastCandle.close);
                     if (new Date(newCandles[0].time).getTime() == new Date(lastCandle.time).getTime()) {
+                        if (mID == 14) {
+                            console.log("Last Candle");
+                            console.log(lastCandle);
+                        }
                         //first new candle needs to be merged
                         lastCandle.low = Math.min(lastCandle.low, newCandles[0].low);
                         lastCandle.high = Math.max(lastCandle.high, newCandles[0].high);
