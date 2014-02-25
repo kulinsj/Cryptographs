@@ -118,6 +118,9 @@ db.on('open', function callback(){
 
 function parseTrades(data){
     var mID = parseInt(data.marketid);
+
+    var test = (mID == 14);
+
     var trades = data.recenttrades;
     trades.sort(function(a, b){
         return a.id - b.id;
@@ -147,7 +150,7 @@ function parseTrades(data){
                 numTrades = trades.length;
                 if (numTrades > 0) {
                     //console.log("Time Zone Offset = " + new Date(trades[0].time).getTimezoneOffset());
-                    console.log("Trade 0 id = " + trades[0].id + " and time = "+trades[0].time + "  TS= "+ new Date(trades[0].time).getTime());
+                    //console.log("Trade 0 id = " + trades[0].id + " and time = "+trades[0].time + "  TS= "+ new Date(trades[0].time).getTime());
                     var newCandles = formatCandles(mID, MINUTE, trades, lastCandle.close);
                     if (new Date(newCandles[0].time).getTime() == new Date(lastCandle.time).getTime()) {
                         //first new candle needs to be merged
@@ -158,8 +161,18 @@ function parseTrades(data){
                         lastCandle.save(function(err){
                             if (err) console.log("Error updating existing lastCandle");
                         });
+                        if (test) {
+                            console.log("pre trim");
+                            console.log(newCandles);
+                        }
                         if (newCandles.length > 1) {
                             newCandles = newCandles.slice(1);
+
+                            if (test) {
+                                console.log("post trim");
+                                console.log(newCandles);
+                            }
+
                             MinCandles.create(newCandles, function(err){
                                 if (err) console.log("Error "+ err);
                                 //else console.log("saved "+ newCandles.length +" new candles for mID "+ mID + " with merge");
