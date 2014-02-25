@@ -119,8 +119,6 @@ db.on('open', function callback(){
 function parseTrades(data){
     var mID = parseInt(data.marketid);
 
-    var test = (mID == 14);
-
     var trades = data.recenttrades;
     trades.sort(function(a, b){
         return a.id - b.id;
@@ -161,14 +159,14 @@ function parseTrades(data){
                         lastCandle.save(function(err){
                             if (err) console.log("Error updating existing lastCandle");
                         });
-                        if (test) {
+                        if (mID == 14) {
                             console.log("pre trim");
                             console.log(newCandles);
                         }
                         if (newCandles.length > 1) {
                             newCandles = newCandles.slice(1);
 
-                            if (test) {
+                            if (mID == 14) {
                                 console.log("post trim");
                                 console.log(newCandles);
                             }
