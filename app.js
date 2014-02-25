@@ -12,7 +12,6 @@ onServer = process.env.MONGOLAB_URI || process.env.MONGOHQ_URL;
 console.log(onServer?"On Server":"On local");
 
 var uristring =
-    process.env.MONGOLAB_URI ||
     process.env.MONGOHQ_URL ||
     'mongodb://localhost/Markets14';
 var theport = process.env.PORT || 2500;
@@ -240,7 +239,7 @@ function formatCandles(mID, interval, trades, heldPrice){
     var currentDate = new Date(Math.floor(new Date(trades[0].time).getTime()/MINUTE)*MINUTE);
     if (onServer){
         //Adjust by 5 hours for time offset b/w Cryptsy and Heroku
-        currentDate = new Date(currentDate.getTime() + 18000000).getTime();
+        currentDate = new Date(currentDate.getTime() + 18000000);
     }
     // Note: only keep "nextDateStamp" as a stamp
     var nextDateStamp = new Date(currentDate.getTime() + interval).getTime();
