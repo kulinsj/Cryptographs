@@ -45,6 +45,8 @@ function verifyData(theData) {
         //check for gaps in the data
         var currentMinute = new Date(theData[0].time).getMinutes();
         for (var i = 0; i < theData.length; i++){
+            console.log(theData[i]);
+            console.log(theData[i].time);
             if (currentMinute != new Date(theData[i].time).getMinutes())
                 console.log("Data minute Gap");
             currentMinute++;
