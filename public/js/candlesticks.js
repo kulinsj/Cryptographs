@@ -47,8 +47,11 @@ function verifyData(theData) {
         for (var i = 0; i < theData.length; i++){
             console.log(theData[i]);
             console.log(theData[i].time);
-            if (currentMinute != new Date(theData[i].time).getMinutes())
-                console.log("Data minute Gap");
+            if (currentMinute != new Date(theData[i].time).getMinutes()) {
+                console.log("Data minute Gap = " + (new Date(theData[i].time).getMinutes() - currentMinute));
+                currentMinute = new Date(theData[i].time).getMinutes();
+            }
+
             currentMinute++;
             if (currentMinute == 60)
                 currentMinute = 0;
