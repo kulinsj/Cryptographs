@@ -14,7 +14,7 @@ console.log(onServer?"On Server":"On local");
 var uristring =
     process.env.MONGOLAB_URI ||
     process.env.MONGOHQ_URL ||
-    'mongodb://localhost/Markets13';
+    'mongodb://localhost/Markets14';
 var theport = process.env.PORT || 2500;
 
 app.use('/', express.static(__dirname + '/public'));
@@ -238,6 +238,10 @@ function parseTrades(data){
 function formatCandles(mID, interval, trades, heldPrice){
     // Note: assume trades are sorted, that trades[0] is the oldest
     var currentDate = new Date(Math.floor(new Date(trades[0].time).getTime()/MINUTE)*MINUTE);
+    if (onServer){
+        //Adjust by 5 hours for time offset b/w Cryptsy and Heroku
+        currentDate = new Date(currentDate.getTime() + 18000000).getTime();
+    }
     // Note: only keep "nextDateStamp" as a stamp
     var nextDateStamp = new Date(currentDate.getTime() + interval).getTime();
 
@@ -248,7 +252,11 @@ function formatCandles(mID, interval, trades, heldPrice){
     var numTrades = trades.length;
     for (var i = 0; i < numTrades; i++) {
         var tradeTimeStamp = new Date(trades[i].time).getTime();
-
+        //TODO HERE
+        if (onServer){
+            //Adjust by 5 hours for time offset b/w Cryptsy and Heroku
+            tradeTimeStamp += 18000000;
+        }
         if (tradeTimeStamp < nextDateStamp) {
             // current trade iterate belongs to current set
             currentSet.push(parseFloat(trades[i].price));
