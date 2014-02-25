@@ -40,44 +40,56 @@ db.on('error', console.error.bind(console, 'connection error:'));
 db.on('open', function callback(){
     console.log('connected to mongoose');
     var APIfuckUpCount = 0;
+    var timeoutCount = 0;
     setInterval(function(){
         console.log('running GET '+ new Date().toLocaleTimeString());
-            http.get(allCryptsyURL, function(res) {
-                console.log('got response '+ new Date().toLocaleTimeString());
+        http.get(allCryptsyURL, function(res) {
+            console.log('got response '+ new Date().toLocaleTimeString());
 
-                // Buffer the body entirely for processing as a whole.
-                var bodyChunks = [];
-                res.on('data', function(chunk){bodyChunks.push(chunk);}).on('end', function() {
-                    var body = Buffer.concat(bodyChunks);
-                    try {
-                        var data = JSON.parse(body);
-                        var dataPresent = data.return;
-                        if (dataPresent) {
-                            APIfuckUpCount = 0;
-                            var name = data.return.markets;
+            // Buffer the body entirely for processing as a whole.
+            var bodyChunks = [];
+            res.on('data', function(chunk){
+                bodyChunks.push(chunk);
+            }).on('end', function() {
+                var timeoutCount = 0;
+                var body = Buffer.concat(bodyChunks);
+                try {
+                    var data = JSON.parse(body);
+                    var dataPresent = data.return;
+                    if (dataPresent) {
+                        APIfuckUpCount = 0;
+                        var name = data.return.markets;
 
-                            for (var key in name) {
+                        for (var key in name) {
 //                                TODO: emit new trades to sockets
 //                                var callback = function(mID, data){
 //                                    console.log("emitting to sockets in MID" + mID);
 //                                    io.sockets.in(mID).emit('newTrades', {trades: data});
 //                                };
-                                parseTrades(name[key]);
-                            }
+                            parseTrades(name[key]);
                         }
-                        else
-                            console.log("API Fuck up. Count = " + ++APIfuckUpCount);
                     }
-                    catch(e) {
+                    else
                         console.log("API Fuck up. Count = " + ++APIfuckUpCount);
-                        if (e instanceof SyntaxError){
-                            console.log("502 Bad Gateway");
-                        }
-                        else
-                            console.log('caught error: '+ e);
+                }
+                catch(e) {
+                    console.log("API Fuck up. Count = " + ++APIfuckUpCount);
+                    if (e instanceof SyntaxError){
+                        console.log("502 Bad Gateway");
                     }
-                })
-            });
+                    else
+                        console.log('caught error: '+ e);
+                }
+            })
+        }).on('timeout', function(){
+            var loudString = new Array(++timeoutCount).join("!");
+            console.log("Timed out. Reset the router " + loudString );
+        }).on('error', function(){
+            console.log("error");
+        }).setTimeout( 15000, function(){
+            var loudString = new Array(++timeoutCount).join("!");
+            console.log("Timed out. Reset the router " + loudString );
+        });
     },30000);
 
     io.sockets.on('connection', function(socket){
