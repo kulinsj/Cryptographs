@@ -35,8 +35,12 @@ function initial(){
         theData.sort(function(a,b){
             return new Date(a.time).getTime() - new Date(b.time).getTime();
         });
-        verifyData(theData);
-        buildChart(theData);
+        if (verifyData(theData))
+            buildChart(theData);
+        else {
+            console.log("Something has gone wrong");
+            console.log(theData);
+        }
     });
 }
 
@@ -60,7 +64,12 @@ function verifyData(theData) {
             if (currentMinute == 60)
                 currentMinute = 0;
         }
+        console.log('From '+ theData[0].time);
+        console.log('To '+ theData[theData.length -1].time);
+        return true;
     }
+    else
+        return false;
 }
 
 function min(a, b){ return a < b ? a : b ; }

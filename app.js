@@ -227,7 +227,6 @@ function formatCandles(mID, interval, trades, heldPrice){
     var numTrades = trades.length;
     for (var i = 0; i < numTrades; i++) {
         var tradeTimeStamp = new Date(trades[i].time).getTime();
-        //TODO HERE
         if (onServer){
             //Adjust by 5 hours for time offset b/w Cryptsy and Heroku
             tradeTimeStamp += 18000000;
