@@ -50,7 +50,7 @@ db.on('open', function callback(){
             res.on('data', function(chunk){
                 bodyChunks.push(chunk);
             }).on('end', function() {
-                var timeoutCount = 0;
+                timeoutCount = 0;
                 var body = Buffer.concat(bodyChunks);
                 try {
                     var data = JSON.parse(body);
@@ -83,13 +83,13 @@ db.on('open', function callback(){
         }).on('timeout', function(){
             var loudString = new Array(++timeoutCount).join("!");
             console.log("Timed out. Reset the router " + loudString );
-        }).on('error', function(){
-            console.log("error");
+        }).on('error', function(e){
+            console.log("error "+ e);
         }).setTimeout( 15000, function(){
             var loudString = new Array(++timeoutCount).join("!");
             console.log("Timed out. Reset the router " + loudString );
         });
-    },30000);
+    },MINUTE*2);
 
     io.sockets.on('connection', function(socket){
         socket.on('ask', function(data){
@@ -158,7 +158,7 @@ function parseTrades(data){
                             newCandles = newCandles.slice(1);
                             MinCandles.create(newCandles, function(err){
                                 if (err) console.log("Error "+ err);
-                                //else console.log("saved "+ newCandles.length +" new candles for mID "+ mID + " with merge");
+                                else console.log("saved "+ newCandles.length +" new candles for mID "+ mID + " with merge");
                             });
                         }
                     }
@@ -190,7 +190,7 @@ function parseTrades(data){
                             newCandles = gapFillerCandles.concat(newCandles);
                         MinCandles.create(newCandles, function(err){
                             if (err) console.log("Error "+ err);
-                            //else console.log("saved "+ newCandles.length +" new candles for mID "+ mID + " with "+fillerCount+" fillers");
+                            else console.log("saved "+ newCandles.length +" new candles for mID "+ mID + " with "+fillerCount+" fillers");
                         });
                     }
                 }
