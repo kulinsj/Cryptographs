@@ -31,7 +31,7 @@ var OneMinCandleSchema = mongoose.Schema({
     volume: Number,
     lastTradeID: Number
 });
-
+var lastCandlesMap = {};
 var MinCandles = mongoose.model('MinCandles', OneMinCandleSchema);
 
 var db = mongoose.connection;
@@ -89,7 +89,7 @@ db.on('open', function callback(){
             var loudString = new Array(++timeoutCount).join("!");
             console.log("Timed out. Reset the router " + loudString );
         });
-    },MINUTE*2);
+    },MINUTE/2);
 
     io.sockets.on('connection', function(socket){
         socket.on('ask', function(data){
@@ -111,8 +111,6 @@ db.on('open', function callback(){
     console.log("Listening on port "+ theport);
 });
 
-var lastCandlesObj = {};
-
 function parseTrades(data){
     var mID = parseInt(data.marketid);
 
@@ -123,94 +121,29 @@ function parseTrades(data){
 
     var numTrades = trades.length;
     if (numTrades > 0) {
-        MinCandles.findOne({'marketid':mID}).sort('-time').exec(function(err, lastCandle){
-            //Attempt to find the most recent candle for this marketID.
-            if(err) console.log(err);
-
-            if (lastCandle) {
-                //not the first time this market is being updated
-                var earliestUsefulID = lastCandle.lastTradeID;
-                if (parseInt(trades[numTrades-1].id) == lastCandle.lastTradeID) {
-                    trades = []; // no new trades
+        if (mID.toString() in lastCandlesMap) {
+            var lastCandle = lastCandlesMap[mID.toString()];
+            updateExistingCandles(lastCandle, trades, mID, numTrades);
+        }
+        else {
+            MinCandles.findOne({'marketid':mID}).sort('-time').exec(function(err, lastCandle){
+                //Attempt to find the most recent candle for this marketID.
+                if(err) console.log(err);
+                if (lastCandle) {
+                    updateExistingCandles(lastCandle, trades, mID, numTrades);
                 }
-                else if ((parseInt(trades[0].id) < earliestUsefulID)) {
-                    //something useful, but need to trim
-                    for (var i = 0; i < numTrades; i++) {
-                        if (parseInt(trades[i].id) > earliestUsefulID ) {
-                            trades = trades.slice(i);
-                            break;
-                        }
-                    }
+                else {
+                    //first time ever for this market
+                    console.log("first mID = "+ mID+" ever.");
+                    var candles = formatCandles(mID, MINUTE, trades, null);
+
+                    MinCandles.create(candles, function(err){
+                        if (err) console.log("Error "+ err);
+                        else console.log("saved "+ candles.length +" new candles for mID "+ mID);
+                    });
                 }
-                numTrades = trades.length;
-                if (numTrades > 0) {
-                    //console.log("Time Zone Offset = " + new Date(trades[0].time).getTimezoneOffset());
-                    //console.log("Trade 0 id = " + trades[0].id + " and time = "+trades[0].time + "  TS= "+ new Date(trades[0].time).getTime());
-                    var newCandles = formatCandles(mID, MINUTE, trades, lastCandle.close);
-                    //save lastCandle to local var to reduce DB queries
-                    //lastCandlesObj[mID.toString] = newCandles
-                    if (new Date(newCandles[0].time).getTime() == new Date(lastCandle.time).getTime()) {
-                        //first new candle needs to be merged
-                        lastCandle.low = Math.min(lastCandle.low, newCandles[0].low);
-                        lastCandle.high = Math.max(lastCandle.high, newCandles[0].high);
-                        lastCandle.volume = lastCandle.volume + newCandles[0].volume;
-                        lastCandle.lastTradeID = newCandles[0].lastTradeID;
-                        lastCandle.save(function(err){
-                            if (err) console.log("Error updating existing lastCandle");
-                        });
-                        if (newCandles.length > 1) {
-                            newCandles = newCandles.slice(1);
-                            MinCandles.create(newCandles, function(err){
-                                if (err) console.log("Error "+ err);
-                                else console.log("saved "+ newCandles.length +" new candles for mID "+ mID + " with merge");
-                            });
-                        }
-                    }
-                    else {
-                        var startDateStamp = new Date(lastCandle.time).getTime() + MINUTE;
-                        var endDateStamp = new Date(newCandles[0].time).getTime() - MINUTE;
-
-                        var fillerCount = 0;
-                        if (endDateStamp >= startDateStamp) {
-                            //need to fill the gap in the data
-                            var gapFillerCandles = [];
-                            var heldPrice = lastCandle.close;
-                            for (var t = startDateStamp; t <= endDateStamp; t += MINUTE) {
-                                fillerCount++;
-                                gapFillerCandles.push({
-                                    "volume":0,
-                                    "marketid": mID,
-                                    "high":heldPrice,
-                                    "low":heldPrice,
-                                    "open":heldPrice,
-                                    "close":heldPrice,
-                                    "time":new Date(t),
-                                    "lastTradeID":lastCandle.lastTradeID
-                                });
-
-                            }
-                        }
-                        if (fillerCount > 0)
-                            newCandles = gapFillerCandles.concat(newCandles);
-                        MinCandles.create(newCandles, function(err){
-                            if (err) console.log("Error "+ err);
-                            else console.log("saved "+ newCandles.length +" new candles for mID "+ mID + " with "+fillerCount+" fillers");
-                        });
-                    }
-                }
-            }
-
-            else {
-                //first time ever for this market
-                console.log("first mID = "+ mID+" ever.");
-                var candles = formatCandles(mID, MINUTE, trades, null);
-
-                MinCandles.create(candles, function(err){
-                    if (err) console.log("Error "+ err);
-                    else console.log("saved "+ candles.length +" new candles for mID "+ mID);
-                });
-            }
-        });
+            });
+        }
     }
 }
 
@@ -320,4 +253,87 @@ function formatCandles(mID, interval, trades, heldPrice){
     }
     //All given trades were formatted to minCandles
     return(returnable);
+}
+
+function updateExistingCandles(lastCandle, trades, mID, numTrades){
+    //not the first time this market is being updated
+    var earliestUsefulID = lastCandle.lastTradeID;
+    if (parseInt(trades[numTrades-1].id) == lastCandle.lastTradeID) {
+        trades = []; // no new trades
+    }
+    else if ((parseInt(trades[0].id) < earliestUsefulID)) {
+        //something useful, but need to trim
+        for (var i = 0; i < numTrades; i++) {
+            if (parseInt(trades[i].id) > earliestUsefulID ) {
+                trades = trades.slice(i);
+                break;
+            }
+        }
+    }
+    numTrades = trades.length;
+    if (numTrades > 0) {
+        //console.log("Time Zone Offset = " + new Date(trades[0].time).getTimezoneOffset());
+        //console.log("Trade 0 id = " + trades[0].id + " and time = "+trades[0].time + "  TS= "+ new Date(trades[0].time).getTime());
+        var newCandles = formatCandles(mID, MINUTE, trades, lastCandle.close);
+        //save lastCandle to local var to reduce DB queries
+        //lastCandlesObj[mID.toString] = newCandles
+        if (new Date(newCandles[0].time).getTime() == new Date(lastCandle.time).getTime()) {
+            //first new candle needs to be merged
+            lastCandle.low = Math.min(lastCandle.low, newCandles[0].low);
+            lastCandle.high = Math.max(lastCandle.high, newCandles[0].high);
+            lastCandle.volume = lastCandle.volume + newCandles[0].volume;
+            lastCandle.lastTradeID = newCandles[0].lastTradeID;
+            lastCandle.save(function(err, candle){
+                if (err) console.log("Error updating existing lastCandle");
+                else if (newCandles.length == 1){
+                    //if this is still the last candle, save a copy of the ref in memory
+                    lastCandlesMap[mID.toString()] = candle;
+                }
+            });
+            if (newCandles.length > 1) {
+                newCandles = newCandles.slice(1);
+                MinCandles.create(newCandles, function(err){
+                    if (err) console.log("Error "+ err);
+                    else{
+                        console.log("saved "+ newCandles.length +" new candles for mID "+ mID + " with merge");
+                        lastCandlesMap[mID.toString()] = arguments[arguments.length-1];
+                    }
+                });
+            }
+        }
+        else {
+            var startDateStamp = new Date(lastCandle.time).getTime() + MINUTE;
+            var endDateStamp = new Date(newCandles[0].time).getTime() - MINUTE;
+
+            var fillerCount = 0;
+            if (endDateStamp >= startDateStamp) {
+                //need to fill the gap in the data
+                var gapFillerCandles = [];
+                var heldPrice = lastCandle.close;
+                for (var t = startDateStamp; t <= endDateStamp; t += MINUTE) {
+                    fillerCount++;
+                    gapFillerCandles.push({
+                        "volume":0,
+                        "marketid": mID,
+                        "high":heldPrice,
+                        "low":heldPrice,
+                        "open":heldPrice,
+                        "close":heldPrice,
+                        "time":new Date(t),
+                        "lastTradeID":lastCandle.lastTradeID
+                    });
+
+                }
+            }
+            if (fillerCount > 0)
+                newCandles = gapFillerCandles.concat(newCandles);
+            MinCandles.create(newCandles, function(err, candles1, candles2){
+                if (err) console.log("Error "+ err);
+                else{
+                    console.log("saved "+ newCandles.length +" new candles for mID "+ mID + " with "+fillerCount+" fillers");
+                    lastCandlesMap[mID.toString()] = arguments[arguments.length-1];
+                }
+            });
+        }
+    }
 }
