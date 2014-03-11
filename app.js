@@ -89,7 +89,7 @@ db.on('open', function callback(){
             var loudString = new Array(++timeoutCount).join("!");
             console.log("Timed out. Reset the router " + loudString );
         });
-    },MINUTE/2);
+    },MINUTE*2);
 
     io.sockets.on('connection', function(socket){
         socket.on('ask', function(data){
