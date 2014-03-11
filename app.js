@@ -111,6 +111,8 @@ db.on('open', function callback(){
     console.log("Listening on port "+ theport);
 });
 
+var lastCandlesObj = {};
+
 function parseTrades(data){
     var mID = parseInt(data.marketid);
 
@@ -145,6 +147,8 @@ function parseTrades(data){
                     //console.log("Time Zone Offset = " + new Date(trades[0].time).getTimezoneOffset());
                     //console.log("Trade 0 id = " + trades[0].id + " and time = "+trades[0].time + "  TS= "+ new Date(trades[0].time).getTime());
                     var newCandles = formatCandles(mID, MINUTE, trades, lastCandle.close);
+                    //save lastCandle to local var to reduce DB queries
+                    //lastCandlesObj[mID.toString] = newCandles
                     if (new Date(newCandles[0].time).getTime() == new Date(lastCandle.time).getTime()) {
                         //first new candle needs to be merged
                         lastCandle.low = Math.min(lastCandle.low, newCandles[0].low);
