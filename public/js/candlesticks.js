@@ -5,20 +5,26 @@ var end = new Date();
 var start = new Date(end.getTime() - 1000 * 60 * 60 * 24 * 60);
 var theData = [];
 
-var baseurl = 'http://cryptographs.herokuapp.com';
-//var baseurl = 'http://localhost:2500';
+//var baseurl = 'http://cryptographs.herokuapp.com';
+var baseurl = 'http://localhost:2500';
 
 $updateBtn = $("#updateBtn");
+$dumpBtn = $('#dump');
 $mid = $("#mid");
 $chartContainer = $("#chart");
 
-initial();
+//initial();
 
-//var socket = io.connect(baseurl);
-//socket.on('connect', function(){
-//    socket.emit('ask',{ marketid: 14 });
-//});
-//
+var socket = io.connect(baseurl);
+socket.on('connect', function(){
+    socket.emit('dump');
+    //socket.emit('ask',{ marketid: 14 });
+});
+socket.on('theDump', function(data){
+    console.log('got response');
+    console.log(data);
+    $('body').html(JSON.stringify(data));
+});
 //socket.on('newTrades', function(data){
 //    console.log(data);
 //});
@@ -26,6 +32,13 @@ initial();
 $updateBtn.click(function(){
     $chartContainer.html('');
     initial();
+});
+
+$dumpBtn.click(function(){
+    var requestData = { mID: $mid.val() };
+    $.get(baseurl+'/dump', requestData, function(data, status){
+        $chartContainer.html(data);
+    });
 });
 
 function initial(){

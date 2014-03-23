@@ -38,7 +38,7 @@ var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.on('open', function callback(){
     console.log('connected to mongoose');
-    var APIfuckUpCount = 0;
+    /*var APIfuckUpCount = 0;
     var timeoutCount = 0;
     setInterval(function(){
         console.log('running GET '+ new Date().toLocaleTimeString());
@@ -89,13 +89,26 @@ db.on('open', function callback(){
             var loudString = new Array(++timeoutCount).join("!");
             console.log("Timed out. Reset the router " + loudString );
         });
-    },MINUTE*2);
+    },MINUTE*2);*/
 
     io.sockets.on('connection', function(socket){
         socket.on('ask', function(data){
             socket.join(data.marketid);
         });
         //TODO: send updates to sockets
+
+        socket.on('dump', function(data){
+            var mID = 14;
+            console.log('Client DUMP request for market ' + mID);
+            MinCandles.find({marketid:mID}).exec(function(err, candles){
+                if(err) console.log(err);
+                else {
+                    var num = candles.length;
+                    console.log("found shit, sending "+num+" candles");
+                    socket.emit('theDump',candles);
+                }
+            });
+        });
     });
 
     app.get('/SingleMarket', function(req, res){
@@ -104,6 +117,17 @@ db.on('open', function callback(){
         var Tminus3h = new Date((new Date().getTime())-3*60*60*1000);
         MinCandles.find({marketid:mID}).where('time').gt(Tminus3h).exec(function(err, candles){
             res.end(JSON.stringify(candles));
+        });
+    } );
+
+    app.get('/dump', function(req, res){
+        var mID = req.query.mID;
+        console.log('Client DUMP request for market ' + mID);
+        MinCandles.find({marketid:mID}).exec(function(err, candles){
+            if(err) console.log(err);
+            else {
+                res.end(JSON.stringify(candles));
+            }
         });
     } );
 
